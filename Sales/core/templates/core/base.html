@@ -1,0 +1,47 @@
+
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+     <title> {% block title %} {% endblock title %} </title>
+
+    <!-- Bootstrap CSS -->
+    {% include 'core/_css.html' %}
+    {% block css %}
+    {% endblock css %}  
+
+  </head>    
+  <body>
+    {% include 'core/_js_before_body.html' %}
+    <div class="body-wrapper">  
+      
+      {% include 'core/_sidebar.html' %}
+
+      <div class="main-wrapper mdc-drawer-app-content">
+
+        {% include 'core/_navbar.html' %}
+        <div class="page-wrapper mdc-toolbar-fixed-adjust">
+          <main class="content-wrapper"><!-- AREA PRINCIPAL-->
+            
+            {% block message_initial %}
+            {% endblock message_initial %}
+
+            {% block content %}
+            {% endblock content %}
+          
+          </main>          
+          {% include 'core/_footer.html' %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    
+    {% block js %}
+    {% endblock js %}
+
+    {% include 'core/_js_after_body.html' %}
+  </body>
+</html>
