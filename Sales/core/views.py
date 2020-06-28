@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 # USER
 from Sales.account.forms import UserCustomCreateForm
 from Sales.account.models import User
@@ -14,7 +14,7 @@ def signup(request):
         form = UserCustomCreateForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('index')
+            return redirect('home')
     else:
         form = UserCustomCreateForm()
        

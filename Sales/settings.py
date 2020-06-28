@@ -33,6 +33,8 @@ Allow_hosts = config('ALLOWED_HOSTS', default=[], cast=Csv())
 #ALTERAÇÕES PARA ESTE PROJETO
 # ALTERA O MODELO USER
 AUTH_USER_MODEL = 'account.User'
+LOGIN_REDIRECT_URL = 'core/home' # REDIRECIONAR APÓS LOGIN
+LOGOUT_REDIRECT_URL = 'core/home' # REDIRECIONAR APÓS LOGOUT
 
 # Application definition
 
