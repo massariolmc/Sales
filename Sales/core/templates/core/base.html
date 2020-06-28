@@ -1,47 +1,61 @@
-
 <!doctype html>
 <html lang="pt-br">
   <head>
     <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-     <title> {% block title %} {% endblock title %} </title>
+    {% include 'core/_meta.html' %}
+    
+    <title> {% block title %} {% endblock title %} </title>
+    {% include 'core/_favicon.html' %}    
 
-    <!-- Bootstrap CSS -->
-    {% include 'core/_css.html' %}
-    {% block css %}
+    <!-- CCS DO TEMPLATE PRINCIPAL-->
+    {% include 'core/_css.html' %}       
+    
+    <!-- CCS DESENVOLVEDOR-->
+    {% block css %}           
     {% endblock css %}  
 
   </head>    
   <body>
-    {% include 'core/_js_before_body.html' %}
-    <div class="body-wrapper">  
-      
-      {% include 'core/_sidebar.html' %}
+     <!-- Start Page Loading -->
+    <div id="loader-wrapper">
+      <div id="loader"></div>
+      <div class="loader-section section-left"></div>
+      <div class="loader-section section-right"></div>
+    </div>
+    <!-- End Page Loading -->
 
-      <div class="main-wrapper mdc-drawer-app-content">
+    {% include 'core/_navbar.html' %}
 
-        {% include 'core/_navbar.html' %}
-        <div class="page-wrapper mdc-toolbar-fixed-adjust">
-          <main class="content-wrapper"><!-- AREA PRINCIPAL-->
+    <div id="main">
+      <!-- START WRAPPER -->
+      <div class="wrapper">      
+        
+        {% include 'core/_sidebar_left.html' %}  
+
+        <section id="content">
+          <!--start container-->
+          <div class="container">
             
             {% block message_initial %}
             {% endblock message_initial %}
 
             {% block content %}
             {% endblock content %}
-          
-          </main>          
-          {% include 'core/_footer.html' %}
-        </div>
+          </div>
+        </section>          
+        {% include 'core/_sidebar_right.html' %} 
+
       </div>
     </div>
+
+    {% include 'core/_footer.html' %}
+      
 
     <!-- Optional JavaScript -->
     
     {% block js %}
-    {% endblock js %}
-
+    {% endblock js %}    
+    
     {% include 'core/_js_after_body.html' %}
   </body>
 </html>

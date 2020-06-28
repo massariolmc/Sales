@@ -1,192 +1,137 @@
 {% load static %}
 
-<div class="main-wrapper mdc-drawer-app-content">
-
-<header class="mdc-top-app-bar">
-        <div class="mdc-top-app-bar__row">
-          <div class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-            <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button sidebar-toggler">menu</button>
-            <span class="mdc-top-app-bar__title">Greetings Clyde!</span>
-            <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon search-text-field d-none d-md-flex">
-              <i class="material-icons mdc-text-field__icon">search</i>
-              <input class="mdc-text-field__input" id="text-field-hero-input">
-              <div class="mdc-notched-outline">
-                <div class="mdc-notched-outline__leading"></div>
-                <div class="mdc-notched-outline__notch">
-                  <label for="text-field-hero-input" class="mdc-floating-label">Search..</label>
-                </div>
-                <div class="mdc-notched-outline__trailing"></div>
-              </div>
+<!-- START HEADER -->
+    <header id="header" class="page-topbar">
+      <!-- start header nav-->
+      <div class="navbar-fixed">
+        <nav class="navbar-color gradient-45deg-light-blue-cyan">
+          <div class="nav-wrapper">
+            <ul class="left">
+              <li>
+                <h1 class="logo-wrapper">
+                  <a href="index.html" class="brand-logo darken-1">
+                    <img src="{% static 'core/images/logo/materialize-logo.png'%}" alt="materialize logo">
+                    <span class="logo-text hide-on-med-and-down">Materialize</span>
+                  </a>
+                </h1>
+              </li>
+            </ul>
+            <div class="header-search-wrapper hide-on-med-and-down">
+              <i class="material-icons">search</i>
+              <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explore Materialize" />
             </div>
-          </div>
-          <div class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end mdc-top-app-bar__section-right">
-            <div class="menu-button-container menu-profile d-none d-md-block">
-              <button class="mdc-button mdc-menu-button">
-                <span class="d-flex align-items-center">
-                  <span class="figure">
-                    <img src="{% static 'core/images/faces/face1.jpg' %}" alt="user" class="user">
+            <ul class="right hide-on-med-and-down">
+              <li>
+                <a href="javascript:void(0);" class="waves-effect waves-block waves-light translation-button" data-activates="translation-dropdown">
+                  <span class="flag-icon flag-icon-gb"></span>
+                </a>
+              </li>
+              <li>
+                <a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen">
+                  <i class="material-icons">settings_overscan</i>
+                </a>
+              </li>
+              <li>
+                <a href="javascript:void(0);" class="waves-effect waves-block waves-light notification-button" data-activates="notifications-dropdown">
+                  <i class="material-icons">notifications_none
+                    <small class="notification-badge pink accent-2">5</small>
+                  </i>
+                </a>
+              </li>
+              <li>
+                <a href="javascript:void(0);" class="waves-effect waves-block waves-light profile-button" data-activates="profile-dropdown">
+                  <span class="avatar-status avatar-online">
+                    <img src="{% static 'core/images/avatar/avatar-7.png' %}" alt="avatar">
+                    <i></i>
                   </span>
-                  <span class="user-name">Clyde Miles</span>
-                </span>
-              </button>
-              <div class="mdc-menu mdc-menu-surface" tabindex="-1">
-                <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical">
-                  <li class="mdc-list-item" role="menuitem">
-                    <div class="item-thumbnail item-thumbnail-icon-only">
-                      <i class="mdi mdi-account-edit-outline text-primary"></i>
-                    </div>
-                    <div class="item-content d-flex align-items-start flex-column justify-content-center">
-                      <h6 class="item-subject font-weight-normal">Edit profile</h6>
-                    </div>
-                  </li>
-                  <li class="mdc-list-item" role="menuitem">
-                    <div class="item-thumbnail item-thumbnail-icon-only">
-                      <i class="mdi mdi-settings-outline text-primary"></i>                      
-                    </div>
-                    <div class="item-content d-flex align-items-start flex-column justify-content-center">
-                      <h6 class="item-subject font-weight-normal">Logout</h6>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div class="divider d-none d-md-block"></div>
-            <div class="menu-button-container d-none d-md-block">
-              <button class="mdc-button mdc-menu-button">
-                <i class="mdi mdi-settings"></i>
-              </button>
-              <div class="mdc-menu mdc-menu-surface" tabindex="-1">
-                <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical">
-                  <li class="mdc-list-item" role="menuitem">
-                    <div class="item-thumbnail item-thumbnail-icon-only">
-                      <i class="mdi mdi-alert-circle-outline text-primary"></i>
-                    </div>
-                    <div class="item-content d-flex align-items-start flex-column justify-content-center">
-                      <h6 class="item-subject font-weight-normal">Settings</h6>
-                    </div>
-                  </li>
-                  <li class="mdc-list-item" role="menuitem">
-                    <div class="item-thumbnail item-thumbnail-icon-only">
-                      <i class="mdi mdi-progress-download text-primary"></i>                      
-                    </div>
-                    <div class="item-content d-flex align-items-start flex-column justify-content-center">
-                      <h6 class="item-subject font-weight-normal">Update</h6>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div class="menu-button-container">
-              <button class="mdc-button mdc-menu-button">
-                <i class="mdi mdi-bell"></i>
-              </button>
-              <div class="mdc-menu mdc-menu-surface" tabindex="-1">
-                <h6 class="title"> <i class="mdi mdi-bell-outline mr-2 tx-16"></i> Notifications</h6>
-                <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical">
-                  <li class="mdc-list-item" role="menuitem">
-                    <div class="item-thumbnail item-thumbnail-icon">
-                      <i class="mdi mdi-email-outline"></i>
-                    </div>
-                    <div class="item-content d-flex align-items-start flex-column justify-content-center">
-                      <h6 class="item-subject font-weight-normal">You received a new message</h6>
-                      <small class="text-muted"> 6 min ago </small>
-                    </div>
-                  </li>
-                  <li class="mdc-list-item" role="menuitem">
-                    <div class="item-thumbnail item-thumbnail-icon">
-                      <i class="mdi mdi-account-outline"></i>                      
-                    </div>
-                    <div class="item-content d-flex align-items-start flex-column justify-content-center">
-                      <h6 class="item-subject font-weight-normal">New user registered</h6>
-                      <small class="text-muted"> 15 min ago </small>
-                    </div>
-                  </li>
-                  <li class="mdc-list-item" role="menuitem">
-                    <div class="item-thumbnail item-thumbnail-icon">
-                      <i class="mdi mdi-alert-circle-outline"></i>
-                    </div>
-                    <div class="item-content d-flex align-items-start flex-column justify-content-center">
-                      <h6 class="item-subject font-weight-normal">System Alert</h6>
-                      <small class="text-muted"> 2 days ago </small>
-                    </div>
-                  </li> 
-                  <li class="mdc-list-item" role="menuitem">
-                    <div class="item-thumbnail item-thumbnail-icon">
-                      <i class="mdi mdi-update"></i>
-                    </div>
-                    <div class="item-content d-flex align-items-start flex-column justify-content-center">
-                      <h6 class="item-subject font-weight-normal">You have a new update</h6>
-                      <small class="text-muted"> 3 days ago </small>
-                    </div>
-                  </li> 
-                </ul>
-              </div>
-            </div>
-            <div class="menu-button-container">
-              <button class="mdc-button mdc-menu-button">
-                <i class="mdi mdi-email"></i>
-                <span class="count-indicator">
-                  <span class="count">3</span>
-                </span>
-              </button>
-              <div class="mdc-menu mdc-menu-surface" tabindex="-1">
-                <h6 class="title"><i class="mdi mdi-email-outline mr-2 tx-16"></i> Messages</h6>
-                <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical">
-                  <li class="mdc-list-item" role="menuitem">
-                    <div class="item-thumbnail">
-                      <img src="{% static 'core/images/faces/face4.jpg'%}" alt="user">
-                    </div>
-                    <div class="item-content d-flex align-items-start flex-column justify-content-center">
-                      <h6 class="item-subject font-weight-normal">Mark send you a message</h6>
-                      <small class="text-muted"> 1 Minutes ago </small>
-                    </div>
-                  </li>
-                  <li class="mdc-list-item" role="menuitem">
-                    <div class="item-thumbnail">
-                      <img src="{% static 'core/images/faces/face2.jpg'%}" alt="user">
-                    </div>
-                    <div class="item-content d-flex align-items-start flex-column justify-content-center">
-                      <h6 class="item-subject font-weight-normal">Cregh send you a message</h6>
-                      <small class="text-muted"> 15 Minutes ago </small>
-                    </div>
-                  </li>
-                  <li class="mdc-list-item" role="menuitem">
-                    <div class="item-thumbnail">
-                      <img src="{% static 'core/images/faces/face3.jpg' %}" alt="user">
-                    </div>
-                    <div class="item-content d-flex align-items-start flex-column justify-content-center">
-                      <h6 class="item-subject font-weight-normal">Profile picture updated</h6>
-                      <small class="text-muted"> 18 Minutes ago </small>
-                    </div>
-                  </li>                
-                </ul>
-              </div>
-            </div>
-            <div class="menu-button-container d-none d-md-block">
-              <button class="mdc-button mdc-menu-button">
-                <i class="mdi mdi-arrow-down-bold-box"></i>
-              </button>
-              <div class="mdc-menu mdc-menu-surface" tabindex="-1">
-                <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical">
-                  <li class="mdc-list-item" role="menuitem">
-                    <div class="item-thumbnail item-thumbnail-icon-only">
-                      <i class="mdi mdi-lock-outline text-primary"></i>
-                    </div>
-                    <div class="item-content d-flex align-items-start flex-column justify-content-center">
-                      <h6 class="item-subject font-weight-normal">Lock screen</h6>
-                    </div>
-                  </li>
-                  <li class="mdc-list-item" role="menuitem">
-                    <div class="item-thumbnail item-thumbnail-icon-only">
-                      <i class="mdi mdi-logout-variant text-primary"></i>                      
-                    </div>
-                    <div class="item-content d-flex align-items-start flex-column justify-content-center">
-                      <h6 class="item-subject font-weight-normal">Logout</h6>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </div>
+                </a>
+              </li>
+              <li>
+                <a href="#" data-activates="chat-out" class="waves-effect waves-block waves-light chat-collapse">
+                  <i class="material-icons">format_indent_increase</i>
+                </a>
+              </li>
+            </ul>
+            <!-- translation-button -->
+            <ul id="translation-dropdown" class="dropdown-content">
+              <li>
+                <a href="#!" class="grey-text text-darken-1">
+                  <i class="flag-icon flag-icon-gb"></i> English</a>
+              </li>
+              <li>
+                <a href="#!" class="grey-text text-darken-1">
+                  <i class="flag-icon flag-icon-fr"></i> French</a>
+              </li>
+              <li>
+                <a href="#!" class="grey-text text-darken-1">
+                  <i class="flag-icon flag-icon-cn"></i> Chinese</a>
+              </li>
+              <li>
+                <a href="#!" class="grey-text text-darken-1">
+                  <i class="flag-icon flag-icon-de"></i> German</a>
+              </li>
+            </ul>
+            <!-- notifications-dropdown -->
+            <ul id="notifications-dropdown" class="dropdown-content">
+              <li>
+                <h6>NOTIFICATIONS
+                  <span class="new badge">5</span>
+                </h6>
+              </li>
+              <li class="divider"></li>
+              <li>
+                <a href="#!" class="grey-text text-darken-2">
+                  <span class="material-icons icon-bg-circle cyan small">add_shopping_cart</span> A new order has been placed!</a>
+                <time class="media-meta" datetime="2015-06-12T20:50:48+08:00">2 hours ago</time>
+              </li>
+              <li>
+                <a href="#!" class="grey-text text-darken-2">
+                  <span class="material-icons icon-bg-circle red small">stars</span> Completed the task</a>
+                <time class="media-meta" datetime="2015-06-12T20:50:48+08:00">3 days ago</time>
+              </li>
+              <li>
+                <a href="#!" class="grey-text text-darken-2">
+                  <span class="material-icons icon-bg-circle teal small">settings</span> Settings updated</a>
+                <time class="media-meta" datetime="2015-06-12T20:50:48+08:00">4 days ago</time>
+              </li>
+              <li>
+                <a href="#!" class="grey-text text-darken-2">
+                  <span class="material-icons icon-bg-circle deep-orange small">today</span> Director meeting started</a>
+                <time class="media-meta" datetime="2015-06-12T20:50:48+08:00">6 days ago</time>
+              </li>
+              <li>
+                <a href="#!" class="grey-text text-darken-2">
+                  <span class="material-icons icon-bg-circle amber small">trending_up</span> Generate monthly report</a>
+                <time class="media-meta" datetime="2015-06-12T20:50:48+08:00">1 week ago</time>
+              </li>
+            </ul>
+            <!-- profile-dropdown -->
+            <ul id="profile-dropdown" class="dropdown-content">
+              <li>
+                <a href="#" class="grey-text text-darken-1">
+                  <i class="material-icons">face</i> Profile</a>
+              </li>
+              <li>
+                <a href="#" class="grey-text text-darken-1">
+                  <i class="material-icons">settings</i> Settings</a>
+              </li>
+              <li>
+                <a href="#" class="grey-text text-darken-1">
+                  <i class="material-icons">live_help</i> Help</a>
+              </li>
+              <li class="divider"></li>
+              <li>
+                <a href="#" class="grey-text text-darken-1">
+                  <i class="material-icons">lock_outline</i> Lock</a>
+              </li>
+              <li>
+                <a href="#" class="grey-text text-darken-1">
+                  <i class="material-icons">keyboard_tab</i> Logout</a>
+              </li>
+            </ul>
           </div>
-        </div>
-      </header>
+        </nav>
+      </div>
+      <!-- end header nav-->
+    </header>
+    <!-- END HEADER -->

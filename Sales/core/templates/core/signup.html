@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+
+{% block title%}
+    Signup
+{% endblock title%}
+
+{% block content %}
+<div id="basic-form" class="section">
+  <div class="row">
+    <div class="col s4 offset-s4">
+      <div class="card-panel">
+        <h4 class="header2">Cadastro de Usuário</h4>
+        <div class="row">
+          <form method="POST">
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div class="row">
+              <div class="input-field col s12">    
+                <div class="fieldWrapper">                                        
+                    {{ field.label_tag }} {{ field }}                    
+                    {{ field.errors }}
+                </div>    
+              </div>
+            </div>
+            {% endfor %}  
+            <div class="row">                            
+              <div class="row">
+                <div class="input-field col s12">
+                  <button class="btn waves-effect waves-light right" type="submit" name="action">Submit
+                    <i class="material-icons right">send</i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
