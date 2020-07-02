@@ -1,0 +1,94 @@
+{% extends 'core/base.html' %}
+
+{% block title %}
+    Usuários - Listagem
+{% endblock title %}
+
+{% block content %}
+
+{% if messages %}    
+    {% for message in messages %}
+        <div class="card-alert card {% ifequal message.level 25 %} green {% else %} red {% endifequal %}">
+            <div class="card-content white-text">                
+                <p> {{ message.level}} {{ message.tags}} {{ message }} </p>                
+            </div>                      
+            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>            
+        </div>
+    {% endfor %}
+{% endif %}
+
+<table class="responsive-table">
+        <thead>
+          <tr>
+              <th>CPF</th>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Criado em</th>
+              <th colspan='3'>opções</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for obj in objects %}
+                <tr>
+                    <td>{{ obj.cpf }}</td>
+                    <td>{{ obj.first_name }} {{ obj.last_name}}</td>
+                    <td>{{ obj.email }}</td>
+                    <td>{{ obj.date_joined }}</td>
+                    <td>
+                        <a href="{% url 'signup:url_signup_edit' obj.id %}"><span class='task-cat waves-effect orange accent-1 black-text'>editar</span></a>
+                        <a href="{% url 'signup:url_signup_detail' obj.id %}"><span class='task-cat waves-effect light-blue black-text'>detalhes</span></a>
+                        <button id="button_modal_{{ obj.id }}" class='task-cat waves-effect red black-text' data-js="modal_delete">deletar</button>                           
+                    </td>
+                </tr>          
+            {% endfor %}
+        </tbody>
+      </table>
+
+ 
+
+       <!-- Modal Structure -->
+  <div id="modal_delete" class="modal">
+    <div class="modal-content">
+      <h4>Exclusão</h4>
+      <p>Tem certeza?</p>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-close waves-effect waves-green btn-flat" id="url_modal">Agree</a>
+    </div>
+  </div>
+
+{% endblock content %}
+
+{% block js %}
+<script>
+    (function(win,doc)
+    {
+        "use strict";
+        console.log('entrei');
+        
+        doc.addEventListener('DOMContentLoaded', function() {  
+        
+            var $del = doc.querySelectorAll('[data-js="modal_delete"]') 
+            var $url = doc.querySelector('#url_model')
+            console.log($del.length);                
+             
+            var Modalelem = document.querySelector('#modal_delete');
+            var instance = M.Modal.init(Modalelem)                  
+         
+            function atribuirEvento(id){
+            doc.getElementById(id).addEventListener("click", function(){
+                    console.log('entrei',id);                                            
+                    instance.open();
+                })
+            }
+            for(var i=0; i < $del.length; i++){
+                console.log($del[i].id)
+                atribuirEvento($del[i].id)
+            }  
+
+        });
+        
+    
+    })(window, document);
+</script>
+{% endblock js %}
