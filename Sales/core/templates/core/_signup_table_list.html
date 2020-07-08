@@ -1,0 +1,57 @@
+<table class="responsive-table striped centered">
+    <thead>
+        <tr>
+            <th>CPF</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Criado em</th>
+            <th colspan='3'>Opções</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for obj in objects %}
+            <tr>
+                <td>{{ obj.cpf }}</td>
+                <td>{{ obj.first_name }} {{ obj.last_name}}</td>
+                <td>{{ obj.email }}</td>
+                <td>{{ obj.date_joined }}</td>
+                <td>
+                    <a href="{% url 'signup:url_signup_edit' obj.id %}"><span class='task-cat waves-effect orange accent-1 black-text'>editar</span></a>
+                    <a href="{% url 'signup:url_signup_detail' obj.id %}"><span class='task-cat waves-effect light-blue black-text'>detalhes</span></a>
+                    <a href="{% url 'signup:url_signup_delete' obj.id %}" id="button_modal_{{ obj.id }}" class='task-cat waves-effect red black-text' data-js="link_delete">deletar</a>                           
+                </td>
+            </tr>
+
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="row">
+    <div class="col s12 m12 l12 offset-s6 offset-m6 offset-l10">
+    {% if objects.has_other_pages %}
+        <ul class="pagination">
+            
+            {% if objects.has_previous %}
+                <li class="waves-effect"><a href="?page={{ objects.previous_page_number }}"><i class="material-icons">chevron_left</i></a></li>
+            {% else %}
+                <li class="disabled"><i class="material-icons">chevron_left</i></li>
+            {% endif %}
+            
+            {% for i in objects.paginator.page_range %}
+                {% if objects.number == i %}
+                    <li class="active waves-effect waves-light cyan">{{ i }}</li>
+                {% else %}
+                    <li class="waves-effect"><a href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if objects.has_next %}
+                <li class="waves-effect"><a href="?page={{ objects.next_page_number }}"><i class="material-icons">chevron_right</i></a></li>
+            {% else %}
+                <li class="disabled"><i class="material-icons">chevron_left</i></span></li>
+            {% endif %}
+        </ul>
+    {% endif %}
+    </div>
+</div>

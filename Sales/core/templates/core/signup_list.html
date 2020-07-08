@@ -1,94 +1,128 @@
 {% extends 'core/base.html' %}
 
+{% load static %}
+
 {% block title %}
     Usuários - Listagem
 {% endblock title %}
 
 {% block content %}
 
-{% if messages %}    
-    {% for message in messages %}
-        <div class="card-alert card {% ifequal message.level 25 %} green {% else %} red {% endifequal %}">
-            <div class="card-content white-text">                
-                <p> {{ message.level}} {{ message.tags}} {{ message }} </p>                
-            </div>                      
-            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>            
+
+{% include 'core/_signup_messages.html' %}
+
+<div class="row">
+    <div class="col s12 m12 l12">
+        <a href="#!" class="breadcrumb">First</a>
+        <a href="#!" class="breadcrumb">Second</a>
+        <a href="#!" class="breadcrumb">Third</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col s12 m12 l12">    
+        <div class="card">       
+
+            <div class="row">    
+                <div class="col s4 m4 l4">
+                    <div class="input-field col s2">    
+                        <select id="sel" data-js="num_pages">            
+                            <option value="1">10</option>
+                            <option value="2">20</option>
+                            <option value="3">30</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <label>Selecione</label>
+                    </div>  
+                </div>    
+
+                <div class="col s3 m3 l3">
+                    <a href="{% url 'signup:url_signup_create' %}" class="waves-effect waves-light  btn-floating btn-large"><i class="material-icons">add</i></a>
+                </div>
+
+                <div class="col s5 m5 l5">        
+                    <form method="GET" class="col s12" >
+                        <div class="input-field col s3 offset-s9">
+                            <input type="text" data-js="input_search" placeholder="Search Here...">                
+                        </div>
+                    </form>        
+                </div>
+            </div>
+
+            <hr class="divider" />
+
+            <div id="table_list">
+                {% include 'core/_signup_table_list.html' %}      
+            </div>
+
         </div>
-    {% endfor %}
-{% endif %}
-
-<table class="responsive-table">
-        <thead>
-          <tr>
-              <th>CPF</th>
-              <th>Nome</th>
-              <th>Email</th>
-              <th>Criado em</th>
-              <th colspan='3'>opções</th>
-          </tr>
-        </thead>
-        <tbody>
-            {% for obj in objects %}
-                <tr>
-                    <td>{{ obj.cpf }}</td>
-                    <td>{{ obj.first_name }} {{ obj.last_name}}</td>
-                    <td>{{ obj.email }}</td>
-                    <td>{{ obj.date_joined }}</td>
-                    <td>
-                        <a href="{% url 'signup:url_signup_edit' obj.id %}"><span class='task-cat waves-effect orange accent-1 black-text'>editar</span></a>
-                        <a href="{% url 'signup:url_signup_detail' obj.id %}"><span class='task-cat waves-effect light-blue black-text'>detalhes</span></a>
-                        <button id="button_modal_{{ obj.id }}" class='task-cat waves-effect red black-text' data-js="modal_delete">deletar</button>                           
-                    </td>
-                </tr>          
-            {% endfor %}
-        </tbody>
-      </table>
-
- 
-
-       <!-- Modal Structure -->
-  <div id="modal_delete" class="modal">
-    <div class="modal-content">
-      <h4>Exclusão</h4>
-      <p>Tem certeza?</p>
     </div>
-    <div class="modal-footer">
-      <a href="#!" class="modal-close waves-effect waves-green btn-flat" id="url_modal">Agree</a>
+</div>
+
+    <!-- Modal Structure -->
+    <div id="modal_delete" class="modal">        
+        <div class="modal-header red">
+            <div class="card-title">
+                <h4 class="flight-card-title">Deseja Excluir?</h4>
+            </div>
+        </div>
+
+        <div class="modal-content ">            
+            <p>Tem certeza?</p>
+        </div>
+        
+        <div class="modal-footer" data-js="insert_link">            
+        </div>        
     </div>
-  </div>
 
 {% endblock content %}
 
 {% block js %}
-<script>
-    (function(win,doc)
-    {
-        "use strict";
-        console.log('entrei');
-        
-        doc.addEventListener('DOMContentLoaded', function() {  
-        
-            var $del = doc.querySelectorAll('[data-js="modal_delete"]') 
-            var $url = doc.querySelector('#url_model')
-            console.log($del.length);                
-             
-            var Modalelem = document.querySelector('#modal_delete');
-            var instance = M.Modal.init(Modalelem)                  
-         
-            function atribuirEvento(id){
-            doc.getElementById(id).addEventListener("click", function(){
-                    console.log('entrei',id);                                            
-                    instance.open();
-                })
-            }
-            for(var i=0; i < $del.length; i++){
-                console.log($del[i].id)
-                atribuirEvento($del[i].id)
-            }  
+    <script type="text/javascript" src="{% static 'core/js/modal_delete.js' %}"></script>
 
-        });
-        
+    <script>
+    (function(doc,win){
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+            'use strict';
+            var $search = doc.querySelector('[data-js="input_search"]');
+            var $table = doc.querySelector('#table_list'); 
+
+            var $select = $('select#sel');  
+            $select.material_select();               
+
+            function on(element,event,callback){
+                doc.querySelector(element).addEventListener(event,callback,false);
+            }            
+            
+            function handleSearch(){
+                console.log('valor do input: ',$search.value);            
+                $.ajax({
+                    url: ' {% url 'signup:url_signup_list' %}',
+                    data: {
+                    'q': $search.value,
+                    'l': $select.val()
+                    },
+                    dataType: 'json',
+                    beforeSend: function () {
+                        //alert("Antes de Enviar");;
+                    },
+                    success: function (data) {
+                        $table.innerHTML = (data.html_signup_list);
+                    },
+                    failure: function(data){
+                        alert("Erro");
+                    },
+                });
+            } 
+
+            on('[data-js="input_search"]','keyup',handleSearch);        
+            $select.on('change', handleSearch);                     
+        });            
+    })(document,window);
     
-    })(window, document);
-</script>
+  </script>
+
 {% endblock js %}

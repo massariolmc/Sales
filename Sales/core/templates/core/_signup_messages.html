@@ -1,0 +1,10 @@
+{% if messages %}    
+    {% for message in messages %}
+        <p>
+            <div class="chip {% ifequal message.level 25 %} gradient-45deg-green-teal {% else %} #d32f2f red darken-2{% endifequal %}">
+                {{ message.level}} {{ message.tags}} {{ message }}
+                <i class="close material-icons">close</i>        
+            </div>        
+        </p>
+    {% endfor %}
+{% endif %}

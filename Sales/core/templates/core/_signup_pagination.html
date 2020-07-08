@@ -1,0 +1,28 @@
+<div class="row">
+    <div class="col s12 m12 l12 offset-s6 offset-m6 offset-l10">
+    {% if objects.has_other_pages %}
+        <ul class="pagination">
+            
+            {% if objects.has_previous %}
+                <li class="waves-effect"><a href="?page={{ objects.previous_page_number }}"><i class="material-icons">chevron_left</i></a></li>
+            {% else %}
+                <li class="disabled"><i class="material-icons">chevron_left</i></li>
+            {% endif %}
+            
+            {% for i in objects.paginator.page_range %}
+                {% if objects.number == i %}
+                    <li class="active waves-effect waves-light cyan">{{ i }}</li>
+                {% else %}
+                    <li class="waves-effect"><a href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if objects.has_next %}
+                <li class="waves-effect"><a href="?page={{ objects.next_page_number }}"><i class="material-icons">chevron_right</i></a></li>
+            {% else %}
+                <li class="disabled"><i class="material-icons">chevron_left</i></span></li>
+            {% endif %}
+        </ul>
+    {% endif %}
+    </div>
+</div>
