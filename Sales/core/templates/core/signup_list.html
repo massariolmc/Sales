@@ -11,54 +11,46 @@
 
 {% include 'core/_signup_messages.html' %}
 
-<div class="row">
-    <div class="col s12 m12 l12">
-        <a href="#!" class="breadcrumb">First</a>
-        <a href="#!" class="breadcrumb">Second</a>
-        <a href="#!" class="breadcrumb">Third</a>
+<div class="card">
+    <div class="card-content gradient-45deg-light-blue-cyan white-text">
+        <span class="card-title">Usuários</span>          
     </div>
-</div>
+    <div class="card-action">
+        <div class="row">    
+            <div class="col s12 m5 l4">
+                <div class="input-field col s2">    
+                    <select id="sel">            
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <label>Selecione</label>
+                </div>  
+            </div>    
 
-<div class="row">
-    <div class="col s12 m12 l12">    
-        <div class="card">       
-
-            <div class="row">    
-                <div class="col s4 m4 l4">
-                    <div class="input-field col s2">    
-                        <select id="sel" data-js="num_pages">            
-                            <option value="1">10</option>
-                            <option value="2">20</option>
-                            <option value="3">30</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                        <label>Selecione</label>
-                    </div>  
-                </div>    
-
-                <div class="col s3 m3 l3">
-                    <a href="{% url 'signup:url_signup_create' %}" class="waves-effect waves-light  btn-floating btn-large"><i class="material-icons">add</i></a>
-                </div>
-
-                <div class="col s5 m5 l5">        
-                    <form method="GET" class="col s12" >
-                        <div class="input-field col s3 offset-s9">
-                            <input type="text" data-js="input_search" placeholder="Search Here...">                
-                        </div>
-                    </form>        
-                </div>
+            <div class="col s12 m2 l3">
+                <a href="{% url 'signup:url_signup_create' %}" class="waves-effect waves-light  btn-floating btn-large"><i class="material-icons">add</i></a>
             </div>
 
-            <hr class="divider" />
-
-            <div id="table_list">
-                {% include 'core/_signup_table_list.html' %}      
+            <div class="col s12 m5 l5">        
+                <form method="GET" class="col s12" >
+                    <div class="input-field col s3 offset-s9">
+                        <input type="text" data-js="input_search" placeholder="Search Here...">                
+                    </div>
+                </form>        
             </div>
+        </div>
 
+        <div class="divider" ></div>
+
+        <div id="table_list" data-url="{% url 'signup:url_signup_list' %}">
+            {% include 'core/_signup_table_list.html' %}      
         </div>
     </div>
 </div>
+
 
     <!-- Modal Structure -->
     <div id="modal_delete" class="modal">        
@@ -79,50 +71,6 @@
 {% endblock content %}
 
 {% block js %}
-    <script type="text/javascript" src="{% static 'core/js/modal_delete.js' %}"></script>
-
-    <script>
-    (function(doc,win){
-
-        document.addEventListener('DOMContentLoaded', function() {
-
-            'use strict';
-            var $search = doc.querySelector('[data-js="input_search"]');
-            var $table = doc.querySelector('#table_list'); 
-
-            var $select = $('select#sel');  
-            $select.material_select();               
-
-            function on(element,event,callback){
-                doc.querySelector(element).addEventListener(event,callback,false);
-            }            
-            
-            function handleSearch(){
-                console.log('valor do input: ',$search.value);            
-                $.ajax({
-                    url: ' {% url 'signup:url_signup_list' %}',
-                    data: {
-                    'q': $search.value,
-                    'l': $select.val()
-                    },
-                    dataType: 'json',
-                    beforeSend: function () {
-                        //alert("Antes de Enviar");;
-                    },
-                    success: function (data) {
-                        $table.innerHTML = (data.html_signup_list);
-                    },
-                    failure: function(data){
-                        alert("Erro");
-                    },
-                });
-            } 
-
-            on('[data-js="input_search"]','keyup',handleSearch);        
-            $select.on('change', handleSearch);                     
-        });            
-    })(document,window);
-    
-  </script>
-
+    <script type="text/javascript" src="{% static 'core/js/js_dev/modal_delete.js' %}"></script>
+    <script type="text/javascript" src="{% static 'core/js/js_dev/data_table_dev.js' %}"></script>
 {% endblock js %}

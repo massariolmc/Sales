@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="pt-br">
-  <head>
+  <head>   
+    
     <!-- Required meta tags -->
     {% include 'core/_meta.html' %}
-    
+
     <title> {% block title %} {% endblock title %} </title>
     {% include 'core/_favicon.html' %}    
 
@@ -15,45 +16,46 @@
     {% endblock css %}  
 
   </head>    
-  <body>
-     <!-- Start Page Loading -->
-    <div id="loader-wrapper">
-      <div id="loader"></div>
-      <div class="loader-section section-left"></div>
-      <div class="loader-section section-right"></div>
-    </div>
-    <!-- End Page Loading -->
+  <body class="hold-transition sidebar-mini">    
+
+  <!-- Site wrapper -->
+  <div class="wrapper">
 
     {% include 'core/_navbar.html' %}
+          
+    {% include 'core/_sidebar.html' %}  
 
-    <div id="main">
-      <!-- START WRAPPER -->
-      <div class="wrapper">      
         
-        {% include 'core/_sidebar_left.html' %}  
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      {% include 'core/_breadcrumb.html' %}
 
-        <section id="content">
-          <!--start container-->
-          <div class="container">
-            
-            {% block message_initial %}
-            {% endblock message_initial %}
+      <!-- Main content -->
+      <section class="content">
+        {% block message_initial %}
+        {% endblock message_initial %}
 
-            {% block content %}
-            {% endblock content %}
-          </div>
-        </section>          
-        {% include 'core/_sidebar_right.html' %} 
-
-      </div>
+        {% block content %}
+        {% endblock content %}
+      </section>
     </div>
-
+    <!-- /.content-wrapper -->
+            
+          
     {% include 'core/_footer.html' %}
-      
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+      <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
 
-    <!-- Optional JavaScript -->  
+</div>
+<!-- ./wrapper -->
+      
+    <!-- JavaScript -->  
     {% include 'core/_js_after_body.html' %}
-       {% block js %}
+    
+    {% block js %}
     {% endblock js %}
   </body>
 </html>

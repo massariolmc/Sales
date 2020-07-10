@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.template.loader import render_to_string
 
 # USER
-from Sales.account.forms import UserCustomCreateForm
+from Sales.account.forms import UserCustomCreateForm, UserChangeForm
 from Sales.account.models import User
 from django.db.models import Q
 
@@ -33,6 +33,7 @@ def signup_list(request):
 
     def pagination(request,obj,lines=10):
         page = request.GET.get('page', 1)
+        print("Valor de page: ",page)
         paginator = Paginator(obj, int(lines))        
         try:
             users = paginator.page(page)
@@ -60,7 +61,7 @@ def signup_list(request):
         return JsonResponse(data)
             
                  
-    lines = 2
+    lines = 10
     users = pagination(request,obj,int(lines))   
     data = {
         'objects': users
@@ -68,9 +69,9 @@ def signup_list(request):
     return render(request,template_name,data)
 
 def signup_edit(request,pk):
-    template_name = 'core/signup_form.html'    
+    template_name = 'core/signup_edit.html'    
     obj = get_object_or_404(User, pk=pk)
-    form = UserCustomCreateForm(request.POST or None, instance=obj)
+    form = UserChangeForm(request.POST or None, instance=obj)
     if request.method == 'POST':        
         if form.is_valid():
             form.save()

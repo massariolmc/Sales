@@ -1,12 +1,14 @@
 {% load static %}
 
-<!-- CORE CSS-->
-    <link href="{% static 'core/css/materialize.css' %}" type="text/css" rel="stylesheet">
-    <link href="{% static 'core/css/style.css' %}" type="text/css" rel="stylesheet">
-    <!-- Custome CSS-->
-    <link href="{% static 'core/css/custom/custom.css' %}" type="text/css" rel="stylesheet">
-    <!-- INCLUDED PLUGIN CSS ON THIS PAGE -->
-    <link href="{% static 'core/vendors/perfect-scrollbar/perfect-scrollbar.css' %}" type="text/css" rel="stylesheet">
-    <link href="{% static 'core/vendors/flag-icon/css/flag-icon.min.css' %}" type="text/css" rel="stylesheet">
-
+    <!-- CORE CSS-->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'core/plugins/fontawesome-free/css/all.min.css' %}">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- overlayScrollbars -->
+    <link rel="stylesheet" href="{% static 'core/css/adminlte.min.css' %}">    
+    
+    <!-- Custome CSS-->      
     <link href="{% static 'core/css/style_dev.css' %}?{% now "U" %}" type="text/css" rel="stylesheet">
+
+
