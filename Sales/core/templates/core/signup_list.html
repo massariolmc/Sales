@@ -8,69 +8,103 @@
 
 {% block content %}
 
-
 {% include 'core/_signup_messages.html' %}
 
-<div class="card">
-    <div class="card-content gradient-45deg-light-blue-cyan white-text">
-        <span class="card-title">Usuários</span>          
-    </div>
-    <div class="card-action">
-        <div class="row">    
-            <div class="col s12 m5 l4">
-                <div class="input-field col s2">    
-                    <select id="sel">            
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="30">30</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                    <label>Selecione</label>
-                </div>  
-            </div>    
 
-            <div class="col s12 m2 l3">
-                <a href="{% url 'signup:url_signup_create' %}" class="waves-effect waves-light  btn-floating btn-large"><i class="material-icons">add</i></a>
-            </div>
-
-            <div class="col s12 m5 l5">        
-                <form method="GET" class="col s12" >
-                    <div class="input-field col s3 offset-s9">
-                        <input type="text" data-js="input_search" placeholder="Search Here...">                
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+        
+        <a class="btn btn-success" href="{% url 'signup:url_signup_create' %}"><i class="fas fa-plus-circle fa-1x"></i>Adicionar</a>
+        
+        <hr class="divider">
+            <div class="card-header">           
+                <div class="row">                        
+                    <div class="col-sm-6">
+                        <div class="input-group input-group-sm" style="width: 150px;">
+                            <select data-js="select_lines" class="form-control" id="sel">            
+                                <option value="1">10</option>
+                                <option value="2">20</option>
+                                <option value="3">30</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            
+                        </div>
                     </div>
-                </form>        
+                    
+                    <div class="col-sm-6">
+                        <div class="input-group input-group-sm float-right" style="width: 150px;">
+                            <input type="text" name="table_search" class="form-control" placeholder="Search" data-js="search">
+
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>                                    
+            </div>                
+            <!-- /.card-header -->     
+            <div id="table_list" data-url="{% url 'signup:url_signup_list' %}">         
+            {% include 'core/_signup_table_list.html' %}                      
             </div>
+            <!-- /.card-body -->              
         </div>
-
-        <div class="divider" ></div>
-
-        <div id="table_list" data-url="{% url 'signup:url_signup_list' %}">
-            {% include 'core/_signup_table_list.html' %}      
-        </div>
+        <!-- /.card -->
     </div>
 </div>
 
-
-    <!-- Modal Structure -->
-    <div id="modal_delete" class="modal">        
-        <div class="modal-header red">
-            <div class="card-title">
-                <h4 class="flight-card-title">Deseja Excluir?</h4>
+<!-- MODAL DELETE -->
+<div class="modal fade" id="modal-danger" data-js="modal_delete">
+    <div class="modal-dialog">
+        <div class="modal-content bg-danger">
+            <div class="modal-header">
+                <h4 class="modal-title">Deseja Excluir?</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza?</p>
+            </div>
+            <div class="modal-footer justify-content-between" data-js="insert_button">
+                <button type="button" class="btn btn-outline-light" data-dismiss="modal">Não</button>
+                <a type="button" class="btn btn-outline-light" data-js="modal_link_delete">Sim</a>
             </div>
         </div>
-
-        <div class="modal-content ">            
-            <p>Tem certeza?</p>
-        </div>
-        
-        <div class="modal-footer" data-js="insert_link">            
-        </div>        
+        <!-- /.modal-content -->
     </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+
+<!-- MODAL CHECKBOX SELECIONADOS -->
+
+<div class="modal fade" id="modal-warning" data-js="modal_checkbox">
+    <div class="modal-dialog">
+        <div class="modal-content bg-warning">
+        <div class="modal-header">
+            <h4 class="modal-title">Warning Modal</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">
+            <p>One fine body&hellip;</p>
+        </div>
+        <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-outline-dark">Save changes</button>
+        </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 
 {% endblock content %}
 
-{% block js %}
-    <script type="text/javascript" src="{% static 'core/js/js_dev/modal_delete.js' %}"></script>
-    <script type="text/javascript" src="{% static 'core/js/js_dev/data_table_dev.js' %}"></script>
+{% block js %}    
+    <script type="text/javascript" src="{% static 'core/js/js_dev/data_table_dev.js' %}"></script>    
 {% endblock js %}

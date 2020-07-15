@@ -91,7 +91,7 @@ def signup_delete(request,pk):
     #obj = get_object_or_404(User, pk=pk)
     #obj.delete()
     messages.success(request, 'Ação concluída com sucesso.')
-    #messages.error(request, 'Ação concluída com sucesso.')    
+    messages.error(request, 'Ação concluída com sucesso.')    
     return redirect('signup:url_signup_list')
 
 

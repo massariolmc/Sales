@@ -36,6 +36,13 @@ AUTH_USER_MODEL = 'account.User'
 LOGIN_REDIRECT_URL = 'core/home' # REDIRECIONAR APÓS LOGIN
 LOGOUT_REDIRECT_URL = 'core/home' # REDIRECIONAR APÓS LOGOUT
 
+# CRISPY
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# Fiz essa alteração para que o firefox não reclame do SameSite, mas não resolveu.
+# Procurar com mais calma como resolver
+# SESSION_COOKIE_SECURE = True
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -45,7 +52,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #App do Projeto           
+    #App do Projeto 
+    'crispy_forms',            
     'Sales.core',
     'Sales.account',
 ]

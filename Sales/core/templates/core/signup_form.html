@@ -1,45 +1,30 @@
 {% extends 'core/base.html' %}
+{% load crispy_forms_tags %}
 
 {% block title%}
-    Signup
+    Cadastro de Usuário
 {% endblock title%}
 
 {% block content %}
-<div id="basic-form" class="section">
-  <div class="row">
-    <div class="col s12 m12 l6 offset-l3">
-      <div class="card-panel">
-        <h4 class="header2">Cadastro de Usuário</h4>
-        <div class="row">
-          <form method="POST">
-            {% csrf_token %}
-            {% for field in form %}
-            <div class="row">
-              <div class="input-field col s12">    
-                <div class="fieldWrapper">                                        
-                    {{ field.label_tag }} {{ field }}                    
-                    {{ field.errors }}
-                </div>    
-              </div>
-            </div>
-            {% endfor %}  
-            <div class="row">                            
-              <div class="row">
-                <div class="input-field col s6">
-                  <a href="{% url 'signup:url_signup_list' %}" class="btn waves-effect waves-light left">Voltar
-                    <i class="material-icons left">settings_backup_restore</i>
-                  </a>
-                </div>
-                <div class="input-field col s6">
-                  <button class="btn waves-effect waves-light right" type="submit" name="action">Salvar
-                    <i class="material-icons right">send</i>
-                  </button>
-                </div>                
-              </div>
-            </div>
-          </form>
-        </div>
+<div class="row justify-content-center">
+  <!-- left column -->
+  <div class="col-md-6">
+    <!-- general form elements -->
+    <div class="card card-primary">
+      <div class="card-header">
+        <h3 class="card-title">Cadastrar</h3>
       </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+      <form method="post">
+        <div class="card-body">
+          {% csrf_token %}
+          {{ form|crispy }}
+        </div>
+        <div class="card-footer">
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

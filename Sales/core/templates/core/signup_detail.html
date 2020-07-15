@@ -4,67 +4,69 @@
 {% endblock title %}
 
 {% block content %}
-<div class="card light-blue">
-    <div class="card-content black-text">
-        <span class="card-title">Detalhes do Usuário</span>
-            <table>    
-            <tbody>
-            <tr>
-                <th>CPF:</th>
-                <td>{{ object.cpf }}</td>
-            </tr>
-            <tr>
-                <th>Nome Completo:</th>
-                <td>{{ object.first_name }} {{object.last_name}}</td>
-            </tr>
-            <tr>
-                <th>Username:</th>
-                <td>{{ object.username }}</td>
-            </tr>
-            <tr>
-                <th>Email:</th>
-                <td>{{ object.cpf }}</td>
-            </tr>
-            <tr>
-                <th>Acesso ambiente admin?:</th>
-                {% if object.is_staff %}
-                    <td>Sim</td>
-                {% else %}
-                    <td>Não</td>
-                {% endif %}
-            </tr>
-            <tr>
-                <th>Ativo?:</th>
-                {% if object.is_active %}
-                    <td>Sim</td>
-                {% else %}
-                    <td>Não</td>
-                {% endif %}
-            </tr>
-            <tr>
-                <th>Data de Criação:</th>
-                <td>{{ object.date_joined }}</td>
-            </tr>
-            <tr>
-                <th>Acesso Recente:</th>
-                <td>Acessou às {{ object.date_login }} / Encerrou às {{ object.date_logout }}</td>
-            </tr>
-            <tr>
-                <th>Data de Criação e Atualização:</th>
-                <td>Criado em: {{ object.created_at }} / Última atualização em: {{ object.updated_at }}</td>
-            </tr>
-            <tr>
-                <th>Cadastrado por:</th>
-                <td>Criado por: {{ object.user_created }} / Última atualização realizada por: {{ object.user_updated }}</td>
-            </tr>           
-            
-            </tbody>
-        </table>
-    </div>
+<div class="callout callout-info">
+    <h5><i class="fas fa-info"></i> Detalhes do Usuário: {{ object.first_name }} {{object.last_name}}</h5>
+    
+
+        <table class="table table-bordered">    
+        <tbody>
+        <tr>
+            <th>CPF:</th>
+            <td>{{ object.cpf }}</td>
+        </tr>
+        <tr>
+            <th>Nome Completo:</th>
+            <td>{{ object.first_name }} {{object.last_name}}</td>
+        </tr>
+        <tr>
+            <th>Username:</th>
+            <td>{{ object.username }}</td>
+        </tr>
+        <tr>
+            <th>Email:</th>
+            <td>{{ object.cpf }}</td>
+        </tr>
+        <tr>
+            <th>Acesso ambiente admin?:</th>
+            {% if object.is_staff %}
+                <td>Sim</td>
+            {% else %}
+                <td>Não</td>
+            {% endif %}
+        </tr>
+        <tr>
+            <th>Ativo?:</th>
+            {% if object.is_active %}
+                <td>Sim</td>
+            {% else %}
+                <td>Não</td>
+            {% endif %}
+        </tr>
+        <tr>
+            <th>Data de Criação:</th>
+            <td>{{ object.date_joined }}</td>
+        </tr>
+        <tr>
+            <th>Acesso Recente:</th>
+            <td>Acessou às {{ object.date_login }} / Encerrou às {{ object.date_logout }}</td>
+        </tr>
+        <tr>
+            <th>Data de Criação e Atualização:</th>
+            <td>Criado em: {{ object.created_at }} / Última atualização em: {{ object.updated_at }}</td>
+        </tr>
+        <tr>
+            <th>Cadastrado por:</th>
+            <td>Criado por: {{ object.user_created }} / Última atualização realizada por: {{ object.user_updated }}</td>
+        </tr>                   
+        </tbody>
+    </table>
+    
     <div class="card-action">
-        <a href="{% url 'signup:url_signup_edit' object.id %}" class="waves-effect waves-light btn gradient-45deg-red-pink">Editar</a>
-        <a href="{% url 'signup:url_signup_list' %}" class="waves-effect waves-light btn gradient-45deg-red-pink">Voltar</a>
+        <a href="{% url 'signup:url_signup_edit' object.id %}" class="btn btn-info">Editar</a>
+        <a href="{% url 'signup:url_signup_list' %}" class="btn btn-warning">Voltar</a>
         
     </div>
+</div>
+
 </div>
 {% endblock content %}

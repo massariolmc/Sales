@@ -32,11 +32,13 @@
 
       <!-- Main content -->
       <section class="content">
-        {% block message_initial %}
-        {% endblock message_initial %}
+        <div class="container-fluid">
+          {% block message_initial %}
+          {% endblock message_initial %}
 
-        {% block content %}
-        {% endblock content %}
+          {% block content %}
+          {% endblock content %}
+        </div>
       </section>
     </div>
     <!-- /.content-wrapper -->
@@ -51,7 +53,7 @@
 
 </div>
 <!-- ./wrapper -->
-      
+
     <!-- JavaScript -->  
     {% include 'core/_js_after_body.html' %}
     
