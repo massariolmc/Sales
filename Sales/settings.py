@@ -33,8 +33,8 @@ Allow_hosts = config('ALLOWED_HOSTS', default=[], cast=Csv())
 #ALTERAÇÕES PARA ESTE PROJETO
 # ALTERA O MODELO USER
 AUTH_USER_MODEL = 'account.User'
-LOGIN_REDIRECT_URL = 'core/home' # REDIRECIONAR APÓS LOGIN
-LOGOUT_REDIRECT_URL = 'core/home' # REDIRECIONAR APÓS LOGOUT
+LOGIN_REDIRECT_URL = '../../home' # REDIRECIONAR APÓS LOGIN
+LOGOUT_REDIRECT_URL = '/accounts/login' # REDIRECIONAR APÓS LOGOUT
 
 # CRISPY
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -74,7 +74,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'Sales/templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -139,3 +139,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# APENAS PARA AMBIENTE DESENVOLVIMENTO
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

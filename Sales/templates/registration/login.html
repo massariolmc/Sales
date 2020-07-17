@@ -1,17 +1,50 @@
-{% extends 'base.html'%}
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+   <!-- Required meta tags -->
+    {% include 'core/_meta.html' %}
 
-{% block title%}
-    Login
-{% endblock title %}
+    <title> {% block title %} {% endblock title %} </title>
+    {% include 'core/_favicon.html' %}    
 
-{% block content %}
+    <!-- CCS DO TEMPLATE PRINCIPAL-->
+    {% include 'core/_css.html' %}   
+</head>
+<body class="hold-transition login-page">
+<div class="login-box">
+  <div class="login-logo">
+    <img class="profile-user-img img-fluid img-circle"
+    src="{% static 'core/img/favicon/login.jpg'%}"
+    alt="Unimodas" style="display: block">
+    <a href=""><b>UNIMODAS</b> - ERP </a>
+  </div>
+  <!-- /.login-logo -->
+  <div class="card">
+    <div class="card-body login-card-body">
+      <p class="login-box-msg">Logue para iniciar a sessão</p>
 
-    <form method="post">
-    {% csrf_token %}
+      <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        {{ form|crispy }}        
+        <div class="row">          
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary btn-block">Logar</button>
+          </div>
+          <!-- /.col -->
+        </div>
+      </form>
 
-    {{ form.as_p }}
-    <button type=submit >login</button>
-    <a href="{% url 'password_reset' %}">Forgot Password?</a>
-    </form>
+      <p class="mb-1">
+        <a href="{% url 'password_reset' %}">Esqueci minha senha</a>
+      </p>      
+    </div>
+    <!-- /.login-card-body -->
+  </div>
+</div>
+<!-- /.login-box -->
 
-{% endblock content %}
+ {% include 'core/_js_after_body.html' %}
+</body>
+</html>

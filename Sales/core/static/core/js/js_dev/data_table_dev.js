@@ -1,13 +1,16 @@
 (function(doc,win){
     doc.addEventListener("DOMContentLoaded", function() {
-        $search = doc.querySelector('[data-js="search"]');
-        $lines = doc.querySelector('[data-js="select_lines"]');
-        $table = doc.querySelector('#table_list');        
+        'use strict';
+        var $search = doc.querySelector('[data-js="search"]');
+        var $lines = doc.querySelector('[data-js="select_lines"]');
+        var $table = doc.querySelector('#table_list');        
         var $modal_link = doc.querySelector('[data-js="modal_link_delete"]');
         var page = 1;    
         
         var $button_checkbox = doc.querySelector('[data-js="click_checkbox"]'); 
-        var $check_all = doc.querySelector('[data-js="check_all"]'); 
+        var $check_all = doc.querySelector('[data-js="check_all"]');         
+        var $modal_link_delete_all = doc.querySelector('[data-js="modal_link_delete_all"]');
+        
 
         function handleSearch(e){        
             $.ajax({
@@ -18,10 +21,12 @@
                 beforeSend : function(){
                     
                 },
-                success: function(data){                    
-                    $table.innerHTML = data.html_signup_list;
+                success: function(data){                                
+                    $table.innerHTML = data.html_signup_list;                    
+                    on('[data-js="click_checkbox"]', 'click', getCheckBoxSelected);
+                    on('[data-js="check_all"]', 'click', handleClickCheckBoxAll);
                     on('.click_page', 'click', handlePage);  
-                    handleClickDelete();         
+                    handleClickDelete();
                 },
                 failure: function(data){
                     
@@ -39,7 +44,7 @@
             var elementoAtual = doc.querySelectorAll('[data-js="link_delete"');
             Array.prototype.slice.call(elementoAtual).forEach(function(pegaElementoAtual){
                 pegaElementoAtual.addEventListener('click', function(e){
-                        e.preventDefault();
+                        e.preventDefault();                        
                         $modal_link.setAttribute('href',e.target.href);
                         $('[data-js="modal_delete"]').modal();
                 });                             
@@ -50,29 +55,56 @@
             doc.querySelector(element).addEventListener(event,callback,false);
         }
         
-        function handleClickCheckBox(e){
+        function getCheckBox(checkbox){
+            var ac = [];
+            for (var i=0; i < checkbox.length; i++){
+                if(checkbox[i].checked === true){                    
+                    ac.push(checkbox[i].value);
+                    console.log('clicado',checkbox[i].value);
+                    console.log('acumulador', ac);                 
+                }                  
+            }
+            return ac;
+        }
+
+        function getCheckBoxSelected(e){
             e.preventDefault();               
             var $checkbox = doc.querySelectorAll('input[name="check_id"]');
-            var ac = [];
-            var marc = false;
-            var $modal_checkbox = doc.querySelector('[data-js="modal_checkbox"]')
-        
-            for (var i=0; i < $checkbox.length; i++){
-                if($checkbox[i].checked === true){
-                    marc = true;
-                    ac.push($checkbox[i].value);
-                    console.log('clicado',$checkbox[i].value);
-                    console.log('acumulador', ac);
-    
-                }
-                else
-                    console.log('nada clicado');
-                    
-            }
-            if (marc === false){
+            var ac = [];                       
+
+            ac = getCheckBox($checkbox)
+
+            if (ac.length == 0){
                 $('[data-js="modal_checkbox"]').modal();
             }
-    
+            else{
+                $('[data-js="modal_delete_all"]').modal();
+            }
+        }
+        function handleClickCheckBox(e){
+            e.preventDefault();
+            var $checkbox = doc.querySelectorAll('input[name="check_id"]');
+            var ac = [];                      
+            ac = getCheckBox($checkbox)
+            ac = JSON.stringify(ac);
+            console.log("valor do ac",ac)
+            var url = $button_checkbox.getAttribute('data-url');
+
+            $.ajax({
+                type: "GET",                
+                url: url,
+                data: {'del': ac },
+                dataType: "json",
+                beforeSend : function(){
+                    
+                },
+                success: function(data){                                         
+                    document.location.reload(true);//Recarrega a página atual        
+                },
+                failure: function(data){
+                    
+                },
+            });
         }
     
         function handleClickCheckBoxAll(e){        
@@ -94,10 +126,10 @@
         $lines.addEventListener('change', handleSearch,false);
         on('.click_page', 'click', handlePage);
         handleClickDelete();                                    
+        on('[data-js="click_checkbox"]', 'click', getCheckBoxSelected);
+        on('[data-js="check_all"]', 'click', handleClickCheckBoxAll);
+        $modal_link_delete_all.addEventListener('click',handleClickCheckBox,false); 
 
-        $button_checkbox.addEventListener('click',handleClickCheckBox,false);
-        $check_all.addEventListener('click',handleClickCheckBoxAll,false); 
-        
     });//DOMContentLoaded
 
 })(document,window);

@@ -75,6 +75,7 @@ def signup_edit(request,pk):
     if request.method == 'POST':        
         if form.is_valid():
             form.save()
+            messages.success(request, 'Ação concluída com sucesso.')
             return redirect('signup:url_signup_list')       
     data = { 'form': form}
     return render(request, template_name,data)
@@ -93,5 +94,23 @@ def signup_delete(request,pk):
     messages.success(request, 'Ação concluída com sucesso.')
     messages.error(request, 'Ação concluída com sucesso.')    
     return redirect('signup:url_signup_list')
+
+def signup_delete_all(request):
+    data = {}
+    context = []
+    context = request.GET.get("del","")
+    print("valor do context", context)
+    messages.success(request, 'entrei no delete all.')            
+    context = context.replace("[","").replace("]","").replace('\"','')
+    context = context.split(",")
+    context = [int(x) for x in context]      
+    if context:                
+        b = User.objects.filter(id__in=context).update(is_active=False)
+        print("Valor do b",b)
+
+    return JsonResponse(data)
+        
+        
+    
 
 
