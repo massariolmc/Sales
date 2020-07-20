@@ -19,7 +19,12 @@
           <img src="{% static 'core/img/user2-160x160.jpg'%}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">Alexander Pierce</a>
+        {% if user.is_authenticated %}
+          <a href="#" class="d-block">{{ request.user.first_name}}</a>
+          <a href="{% url 'logout' %}" class="d-block">Sair</a>
+        {% else %}
+        <a href="#" class="d-block">Visitante</a>
+        {% endif %}
         </div>
       </div>
 

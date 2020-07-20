@@ -60,7 +60,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = _('users')
     
     def __str__(self):
-        return 'cpf:{} - Username: {} - First Name: {} - Last Name - {} - email: {}'.format(self.cpf,self.username,self.first_name, self.last_name, self.email)
+        return '{} {} '.format(self.first_name, self.last_name)
         
     def get_full_name(self):
         full_name = '%s %s' % (self.first_name, self.last_name)

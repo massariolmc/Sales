@@ -1,0 +1,37 @@
+{% load static %}
+<table data-js="dataTables" class="table table-bordered">
+                  <thead>
+                    <tr class="text-sm-center">
+                     <th><div class="icheck-danger d-inline">
+                        <input type="checkbox" data-js="check_all" id="checkbox_main">
+                        <label for="checkbox_main">Selecione
+                        </label>
+                        </div></th>
+                      <th>Nome</th>
+                      <th>Nome Fantasia</th>
+                      <th>CNPJ</th>                      
+                      <th>Email</th>   
+                      <th>Opções</th>                                         
+                    </tr>
+                  </thead>                  
+                  <tbody>
+                    {% for company in companies %}
+                    <tr class="text-sm-center">
+                      <td><div class="icheck-danger d-inline">
+                        <input type="checkbox" name="check_id" value="{{ company.id }}" id="checkbox_{{ company.id }}">
+                        <label for="checkbox_{{ company.id }}">
+                        </label>
+                        </div></td>
+                      <td>{{ company.name }}</td>
+                      <td>{{ company.fantasy_name }}</td>                                
+                      <td>{{ company.cnpj }}</td>                                                                       
+                      <td>{{ company.email }}</td>                                       
+                      <td class="text-center">                        
+                        <a href="{% url 'person:url_company_edit' company.id %}"><span class='badge badge-warning'>editar</span></a>
+                        <a href="{% url 'person:url_company_detail' company.id %}"><span class='badge badge-info'>detalhes</span></a>
+                        <a href="{% url 'person:url_company_delete' company.id %}" id="button_modal_{{ company.id }}" class='badge badge-danger' data-js="link_delete">deletar</a>                           
+                      </td>                      
+                    </tr>                 
+                    {% endfor %}   
+                  </tbody>                  
+                </table>                
