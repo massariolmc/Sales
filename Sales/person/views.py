@@ -7,10 +7,13 @@ from crispy_forms.utils import render_crispy_form
 from django.template.loader import render_to_string
 
 ####### COMPANY
-def save_form(request,form,template_name, data):
-    if request.method == 'POST':                                       
-        if form.is_valid():            
-            form.save()                    
+def save_form(request,form,template_name, data, user_created=None):
+    if request.method == 'POST':                                              
+        if form.is_valid():
+            obj = form.save(commit=False)
+            if user_created:                
+                obj.user_created = user_created                              
+            obj.save()
             return redirect('person:url_companies_list')
         else:
             print("algo não está valido.")               
@@ -20,10 +23,9 @@ def save_form(request,form,template_name, data):
 
 def company_create(request):
     template_name = 'company/form.html'    
-    data = {}
-    data['title'] = "Cadastro de Empresas"
+    data = {"title": "Cadastro de Empresas"}    
     if request.method == 'POST':                       
-        form = CompanyForm(request.POST)                
+        form = CompanyForm(request.POST, request.FILES)                
     else:
         form = CompanyForm()             
     
@@ -31,15 +33,15 @@ def company_create(request):
 
 def company_edit(request, pk):    
     template_name='company/form.html'
-    data = {}    
+    data = {"title": "Editar"}    
     company = get_object_or_404(Company, pk=pk)        
     user_created = company.user_created # Esta linha faz com que o user_created não seja modificado, para mostrar quem criou esta pessoa    
     if request.method == 'POST':                       
-        form = CompanyForm(request.POST, instance=company)                
+        form = CompanyForm(request.POST, request.FILES, instance=company)                
     else:
         form = CompanyForm(instance=company)             
     
-    return save_form(request, form, template_name, data)
+    return save_form(request, form, template_name, data, user_created)
     
 def companies_list(request):
     template_name = "company/list.html"
@@ -71,24 +73,36 @@ def company_delete(request,pk):
     #        messages.warning(request, 'Não é possível excluir. Esta Empresa possui departamento existentes.')
     #        return redirect('url_companies_list') 
     #else:
-    messages.warning(request, 'Ação teste.')
+    if request.method == "POST":
+        messages.warning(request, 'Ação teste POST.')    
+        return redirect('person:url_companies_list')
+    
+    messages.warning(request, 'Ação teste GET.')
     return redirect('person:url_companies_list')
 
 def company_delete_all(request):    
-    data = {}
-    context = []
-    context = request.GET.get("del","")
-    print("valor do context", context)
-    messages.success(request, 'entrei no delete all.')            
-    context = context.replace("[","").replace("]","").replace('\"','')
-    context = context.split(",")
-    context = [int(x) for x in context]      
+    if request.method == "POST":
+        print("Valor do ac", request.POST["checkbox_selected"])
+        messages.warning(request, 'Ação teste POST.')
+    else:
+        print("get")
+    
+    return redirect('person:url_companies_list')
+    
+    # data = {}
+    # context = []
+    # context = request.POST.get("del","")
+    # print("valor do context", context)
+    # messages.success(request, 'entrei no delete all.')            
+    # context = context.replace("[","").replace("]","").replace('\"','')
+    # context = context.split(",")
+    # context = [int(x) for x in context]      
     #if context:                
     #     b = User.objects.filter(id__in=context).update(is_active=False)
     #     print("Valor do b",b)
     #companies = Company.objects.all()
     #data['html_list'] = render_to_string('company/list.html', {'companies': companies})       
-    return JsonResponse(data)    
+    # return JsonResponse(data)    
 
 ########### FIM COMPANY############################
 

@@ -16,7 +16,6 @@ from decouple import config, Csv
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -36,6 +35,7 @@ AUTH_USER_MODEL = 'account.User'
 LOGIN_REDIRECT_URL = '../../home' # REDIRECIONAR APÓS LOGIN
 LOGOUT_REDIRECT_URL = '/accounts/login' # REDIRECIONAR APÓS LOGOUT
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True # Quando fechar o navegador, vai deslogar o usuário
 # CRISPY
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
@@ -81,7 +81,7 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-                'django.template.context_processors.request',
+                'django.template.context_processors.request',                
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],

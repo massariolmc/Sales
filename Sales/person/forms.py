@@ -1,4 +1,4 @@
-from django.forms import ModelForm, TextInput, DateInput, Select, SelectDateWidget, HiddenInput, DateTimeInput, EmailInput
+from django.forms import ModelForm, TextInput, Textarea, DateInput, Select, SelectDateWidget, HiddenInput, DateTimeInput, EmailInput, FileInput
 from .models import Company, Department
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Row, Column, Button, ButtonHolder, HTML, Hidden
@@ -16,8 +16,8 @@ class CompanyForm(ModelForm):
             'number_state': TextInput(attrs={'class': 'form-control'}),
             'email': TextInput(attrs={'class': 'form-control'}),
             'slug': TextInput(attrs={'class': 'form-control'}),
-            'image': TextInput(attrs={'class': 'form-control'}),
-            'description': TextInput(attrs={'class': 'form-control'}),
+            'image': FileInput(attrs={'class': 'form-control'}),
+            'description': Textarea(attrs={'class': 'form-control'}),
             'address': TextInput(attrs={'class': 'form-control'}),
             'address_number': TextInput(attrs={'class': 'form-control'}),
             'neighborhood': TextInput(attrs={'class': 'form-control'}),            
@@ -38,11 +38,16 @@ class CompanyForm(ModelForm):
 
     
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)        
         self.helper = FormHelper()
+        self.enctype = "multipart/form-data"
         self.helper.layout = Layout( 
             Hidden('user_created', '{{ user.id }}'),
             Hidden('user_updated', '{{ user.id }}'),                                   
+            Row(
+                Column('image', css_class='form-group col-md-12 mb-0'),             
+                css_class='form-row'
+            ),
             Row(
                 Column('name', css_class='form-group col-md-3 mb-0'),
                 Column('fantasy_name', css_class='form-group col-md-3 mb-0'),
@@ -68,12 +73,12 @@ class CompanyForm(ModelForm):
                 Column('email', css_class='form-group col-md-4 mb-0'),                                                
                 css_class='form-row'
             ),
-            Row(                
-                Column('image', css_class='form-group col-md-3 mb-0'),
-                Column('description', css_class='form-group col-md-3 mb-0'),                
+            Row(               
+                Column('description', css_class='form-group col-md-12 mb-0'),                
                 css_class='form-row'
             ),
             HTML('''
+                <hr class="divider" />
                  <div class="row">    
                     <div class="col-sm-6">
                         <span class="float-left">

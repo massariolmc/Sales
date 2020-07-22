@@ -16,7 +16,7 @@ class UserCustomCreateForm(UserCreationForm):
         cpf = self.cleaned_data['cpf']
         if not cpf.isdigit():                              
             raise ValidationError("Aceita apenas números.")
-        return name# sempre retornar um dado, de preferencia o valor que estava no campo.
+        return cpf # sempre retornar um dado, de preferencia o valor que estava no campo.
 
 class UserChangeForm(UserChangeForm):
     class Meta:

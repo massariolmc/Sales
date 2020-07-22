@@ -13,7 +13,10 @@
             </div>
             <div class="modal-footer justify-content-between" data-js="insert_button">
                 <button type="button" class="btn btn-outline-light" data-dismiss="modal">Não</button>
-                <a type="button" class="btn btn-outline-light" data-js="modal_link_delete">Sim</a>
+                <form data-js="modal_link_delete" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-light" >Sim</button>
+                </form>                
             </div>
         </div>
         <!-- /.modal-content -->

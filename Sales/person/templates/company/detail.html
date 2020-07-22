@@ -11,8 +11,10 @@
         <div class="col-sm-4">
             <a href="{% url 'person:url_companies_list'%}" class="btn btn-info float-left">Listar todos</a>
         </div>
-        <div class="col-sm-4">
-            <h3><strong>{{ company.name }}</strong></h3>
+        <div class="col-sm-4">      
+        {% if company.image %}<img class="img-profile rounded-circle" src="{{ company.image.url }}" style="width:100px">
+        {% else %}    <h3><strong>{{ company.name }}</strong></h3>
+         {% endif %}
         </div>
         <div class="col-sm-4">
             <span class="float-right">
@@ -50,11 +52,7 @@
                     <tr>
                         <th class="text-right">Slug</th>
                         <td>{{ company.slug }}</td>
-                    </tr>  
-                    <tr>
-                        <th class="text-right">Logo</th>
-                        <td>{{ company.image }}</td>
-                    </tr>                              
+                    </tr>                                                   
                     <tr>
                         <th class="text-right">Endereço</th>
                         <td>{{ company.address}} - {{ company.address_number}}, {{company.neighborhood}}, {{company.city}}/{{company.state}} - <span class="cep">{{company.zip_code}}</span></td>

@@ -13,7 +13,11 @@
             </div>
             <div class="modal-footer justify-content-between" data-js="insert_button">
                 <button type="button" class="btn btn-outline-light" data-dismiss="modal">Não</button>
-                <a type="button" class="btn btn-outline-light" data-js="modal_link_delete_all">Sim</a>
+                <form name="form_modal_delete_all" method="POST" action="{% url 'person:url_company_delete_all' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="checkbox_selected" data-js="hidden_values_checkbox">
+                    <button type="submit" class="btn btn-outline-light" data-js="modal_link_delete_all">Sim</button>
+                </form>                
             </div>
         </div>
         <!-- /.modal-content -->
@@ -23,7 +27,7 @@
 <!-- /.modal -->
 
 
-<!-- MODAL CHECKBOX SELECIONADOS -->
+<!-- MODAL CHECKBOX - DE USUÁRIO NÃO SELECIONADOS -->
 
 <div class="modal fade" id="modal-warning" data-js="modal_checkbox">
     <div class="modal-dialog">
