@@ -1,7 +1,5 @@
 .env
 .venv
-.sql3
-.sql
 *.backup
 .jpg
 .png
@@ -16,6 +14,7 @@
 *.exe
 *.o
 *.so
+*.pyc
 
 # Packages #
 ############
@@ -34,7 +33,7 @@
 ######################
 *.log
 *.sql
-*.sqlite
+*.sqlite3
 
 # OS generated files #
 ######################
