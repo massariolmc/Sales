@@ -8,7 +8,7 @@ class CompanyForm(ModelForm):
 
     class Meta:
         model = Company
-        fields = ['name','fantasy_name','cnpj','number_state','email','image','description','address','address_number','neighborhood','city','state','zip_code','phone_1','phone_2','user_created','user_updated']
+        fields = ['name','fantasy_name','cnpj','number_state','email','image','description','address','address_number','neighborhood','city','state','zip_code','phone_1','phone_2']
         widgets = {
             'name': TextInput(attrs={'class': 'form-control'}),
             'fantasy_name': TextInput(attrs={'class': 'form-control'}),
@@ -48,9 +48,7 @@ class CompanyForm(ModelForm):
         super().__init__(*args, **kwargs)        
         self.helper = FormHelper()
         self.enctype = "multipart/form-data"
-        self.helper.layout = Layout( 
-            Hidden('user_created', '{{ user.id }}'),
-            Hidden('user_updated', '{{ user.id }}'),                                   
+        self.helper.layout = Layout(                                               
             Row(
                 Column('image', css_class='form-group col-md-12 mb-0'),             
                 css_class='form-row'

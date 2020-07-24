@@ -18,7 +18,7 @@
         </div>
         <div class="col-sm-4">
             <span class="float-right">
-                <a href="{% url 'person:url_company_edit' company.id %}">
+                <a href="{% url 'person:url_company_edit' company.slug %}">
                     <button type="button" class="btn btn-success">Editar
                     </button>
                 </a>
@@ -35,11 +35,11 @@
                     </tr>
                     <tr>
                         <th class="text-right">Nome Fantasia</th>
-                        <td class="cnpj">{{ company.fantasy_name }}</td>
+                        <td>{{ company.fantasy_name }}</td>
                     </tr>
                     <tr>
                         <th class="text-right">CNPJ</th>                       
-                        <td>{{ company.cnpj }}</td>                       
+                        <td class="cnpj">{{ company.cnpj }}</td>                       
                     </tr>
                     <tr>
                         <th class="text-right">Inscrição Estadual</th>
@@ -48,11 +48,7 @@
                     <tr>
                         <th class="text-right">Email</th>
                         <td>{{ company.email }}</td>
-                    </tr>   
-                    <tr>
-                        <th class="text-right">Slug</th>
-                        <td>{{ company.slug }}</td>
-                    </tr>                                                   
+                    </tr>                                                                       
                     <tr>
                         <th class="text-right">Endereço</th>
                         <td>{{ company.address}} - {{ company.address_number}}, {{company.neighborhood}}, {{company.city}}/{{company.state}} - <span class="cep">{{company.zip_code}}</span></td>
@@ -80,6 +76,6 @@
 {% endblock content %}
 
 {% block js %}
-
-
+<script src="{% static 'core/plugins/jquery/jquery.mask.min.js'%}"></script>
+<script src="{% static 'default/js/jquery_mask.js'%}"></script>
 {% endblock js %}

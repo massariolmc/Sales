@@ -23,8 +23,8 @@ class Company(models.Model):
     zip_code = models.CharField(_("CEP"), max_length=8, blank=True)
     phone_1 = models.CharField(_("Telefone Principal"), max_length=20, blank=True)
     phone_2 = models.CharField(_("Telefone Secundário"), max_length=20, blank=True)
-    user_created = models.ForeignKey(User, related_name="company_user_created_id", verbose_name=_("Criado por"), on_delete=models.PROTECT)
-    user_updated = models.ForeignKey(User, related_name="company_user_updated_id", verbose_name=_("Atualizado por"), on_delete=models.PROTECT)
+    user_created = models.ForeignKey(User, related_name="company_user_created_id", verbose_name=_("Criado por"), blank=True, on_delete=models.PROTECT)
+    user_updated = models.ForeignKey(User, related_name="company_user_updated_id", verbose_name=_("Atualizado por"), blank=True, on_delete=models.PROTECT)
     created_at = models.DateTimeField(_('Criado em'),auto_now_add=True)
     updated_at = models.DateTimeField(_('Atualizado em'), auto_now=True)
 
@@ -34,15 +34,16 @@ class Company(models.Model):
         ordering = ["name"]   
 
     def save(self, *args, **kwargs):        
-        if self.id:
+        marc = 0
+        if self.id:            
             #Deleta a imagem antiga, caso não for igual
-            delete_old_image(self.__class__, self.id, self.image)            
+            marc = delete_old_image(self.__class__, self.id, self.image)            
         else:
             #Insere um valor para o Slug            
-            self.slug = unique_uuid()        
+            self.slug = unique_uuid(self.__class__)        
         
         # Comprime a imagem
-        if self.image:
+        if marc:           
             new_image = compress(self.image)                
             self.image = new_image           
         # save
@@ -50,7 +51,7 @@ class Company(models.Model):
 
     # Sobreescreve este metodo para delete imagens. Sem a imagem continua em media, mesmo deletando a pessoa do banco
     def delete(self, *args, **kwargs):
-        self.image.delete()
+        self.image.delete(save=False)# Se deixar save=True ele deleta o arquivo e chama o metodo save automaticamente e ai isso gerar erro.
         super().delete(*args, **kwargs)
     
     def __str__(self):
@@ -63,8 +64,8 @@ class Department(models.Model):
     description = models.TextField(_('Descrição'), blank=True)  
     slug = models.SlugField(_('Atalho'), blank=True)      
     company = models.ForeignKey(Company, verbose_name=_("Empresa"), on_delete=models.PROTECT, blank=False, null= False)
-    user_created = models.ForeignKey(User, related_name="department_user_created_id", verbose_name=_("Criado por"), on_delete=models.PROTECT)
-    user_updated = models.ForeignKey(User, related_name="department_user_updated_id", verbose_name=_("Atualizado por"), on_delete=models.PROTECT)
+    user_created = models.ForeignKey(User, related_name="department_user_created_id", verbose_name=_("Criado por"), blank=True, on_delete=models.PROTECT)
+    user_updated = models.ForeignKey(User, related_name="department_user_updated_id", verbose_name=_("Atualizado por"), blank=True, on_delete=models.PROTECT)
     created_at = models.DateTimeField(_('Criado em'),auto_now_add=True)
     updated_at = models.DateTimeField(_('Atualizado em'), auto_now=True)
     class Meta:
@@ -80,8 +81,8 @@ class MaxDiscount(models.Model):
     discount = models.CharField(_("Desconto"), max_length=100, blank=False, null= False)    
     description = models.TextField(_('Descrição'), blank=True)  
     slug = models.SlugField(_('Atalho'), blank=True)          
-    user_created = models.ForeignKey(User, related_name="max_discount_user_created_id", verbose_name=_("Criado por"), on_delete=models.PROTECT)
-    user_updated = models.ForeignKey(User, related_name="max_discount_user_updated_id", verbose_name=_("Atualizado por"), on_delete=models.PROTECT)
+    user_created = models.ForeignKey(User, related_name="max_discount_user_created_id", verbose_name=_("Criado por"), blank=True, on_delete=models.PROTECT)
+    user_updated = models.ForeignKey(User, related_name="max_discount_user_updated_id", verbose_name=_("Atualizado por"), blank=True, on_delete=models.PROTECT)
     created_at = models.DateTimeField(_('Criado em'),auto_now_add=True)
     updated_at = models.DateTimeField(_('Atualizado em'), auto_now=True)
     class Meta:
@@ -97,8 +98,8 @@ class PersonType(models.Model):
     description = models.TextField(_('Descrição'), blank=True)  
     max_discount = models.ForeignKey(MaxDiscount, verbose_name=_("Desconto Max"), on_delete=models.PROTECT)
     slug = models.SlugField(_('Atalho'), blank=True)          
-    user_created = models.ForeignKey(User, related_name="person_type_user_created_id", verbose_name=_("Criado por"), on_delete=models.PROTECT)
-    user_updated = models.ForeignKey(User, related_name="person_type_user_updated_id", verbose_name=_("Atualizado por"), on_delete=models.PROTECT)
+    user_created = models.ForeignKey(User, related_name="person_type_user_created_id", verbose_name=_("Criado por"), blank=True, on_delete=models.PROTECT)
+    user_updated = models.ForeignKey(User, related_name="person_type_user_updated_id", verbose_name=_("Atualizado por"), blank=True, on_delete=models.PROTECT)
     created_at = models.DateTimeField(_('Criado em'),auto_now_add=True)
     updated_at = models.DateTimeField(_('Atualizado em'), auto_now=True)
     class Meta:

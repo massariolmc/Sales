@@ -24,9 +24,7 @@
             var ac = [];
             for (var i=0; i < checkbox.length; i++){
                 if(checkbox[i].checked === true){                    
-                    ac.push(checkbox[i].value);
-                    console.log('clicado',checkbox[i].value);
-                    console.log('acumulador', ac);                 
+                    ac.push(checkbox[i].value);                                        
                 }                  
             }
             return ac;

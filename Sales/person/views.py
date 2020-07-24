@@ -14,8 +14,11 @@ def save_form(request,form,template_name, data, user_created=None):
     if request.method == 'POST':                                              
         if form.is_valid():
             obj = form.save(commit=False)                                   
-            if user_created:                               
-                obj.user_created = user_created                              
+            if user_created:# Se cair aqui é EDIT                               
+                obj.user_created = user_created                
+            else:# Se cair aqui é CREATE
+                obj.user_created = request.user
+            obj.user_updated = request.user  
             obj.save()
             return redirect('person:url_companies_list')
         else:
@@ -34,16 +37,16 @@ def company_create(request):
     
     return save_form(request, form, template_name, data)
 
-def company_edit(request, pk):    
+def company_edit(request, slug):    
     template_name='company/form.html'
     data = {"title": "Editar"}    
-    company = get_object_or_404(Company, pk=pk)           
+    company = get_object_or_404(Company, slug=slug)           
     user_created = company.user_created # Esta linha faz com que o user_created não seja modificado, para mostrar quem criou esta pessoa    
     if request.method == 'POST':        
         form = CompanyForm(request.POST, request.FILES, instance=company)                
     else:
         form = CompanyForm(instance=company)       
-    return save_form(request, form, template_name, data, user_created)
+    return save_form(request, form, template_name, data, user_created=user_created)
     
 def companies_list(request):
     template_name = "company/list.html"
@@ -54,9 +57,9 @@ def companies_list(request):
     }
     return render(request,template_name,context)
 
-def company_detail(request, pk=None):
+def company_detail(request, slug):    
     template_name = "company/detail.html"
-    company = get_object_or_404(Company,pk=pk)
+    company = get_object_or_404(Company,slug=slug)
     context = {
         'company': company
     }
@@ -64,8 +67,8 @@ def company_detail(request, pk=None):
 
 
 
-def company_delete(request,pk):    
-    company = get_object_or_404(Company, pk=pk)    
+def company_delete(request, slug):    
+    company = get_object_or_404(Company, slug=slug)    
     if request.method == 'POST':        
        try:
            company.delete()
@@ -79,9 +82,9 @@ def company_delete_all(request):
     marc = 0    
     if request.method == "POST":        
         context = request.POST["checkbox_selected"].split(",")
-        context = [int(x) for x in context]      
+        context = [str(x) for x in context]      
         if context:                
-            b = Company.objects.filter(id__in=context)            
+            b = Company.objects.filter(slug__in=context)            
             for i in b:                
                 try:
                     i.delete()

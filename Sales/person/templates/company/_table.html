@@ -18,8 +18,8 @@
                     {% for company in companies %}
                     <tr class="text-sm-center">
                       <td><div class="icheck-danger d-inline">
-                        <input type="checkbox" name="check_id" value="{{ company.id }}" id="checkbox_{{ company.id }}">
-                        <label for="checkbox_{{ company.id }}">
+                        <input type="checkbox" name="check_id" value="{{ company.slug }}" id="checkbox_{{ company.slug }}">
+                        <label for="checkbox_{{ company.slug }}">
                         </label>
                         </div></td>
                       <td>{{ company.name }}</td>
@@ -27,9 +27,9 @@
                       <td>{{ company.cnpj }}</td>                                                                       
                       <td>{{ company.email }}</td>                                       
                       <td class="text-center">                        
-                        <a href="{% url 'person:url_company_edit' company.id %}"><span class='badge badge-warning'>editar</span></a>
-                        <a href="{% url 'person:url_company_detail' company.id %}"><span class='badge badge-info'>detalhes</span></a>                                                                          
-                        <a href="" data-url="{% url 'person:url_company_delete' company.id %}" id="button_modal_{{ company.id }}" class='badge badge-danger' data-js="link_delete">deletar</a>
+                        <a href="{% url 'person:url_company_edit' company.slug %}"><span class='badge badge-warning'>editar</span></a>
+                        <a href="{% url 'person:url_company_detail' company.slug %}"><span class='badge badge-info'>detalhes</span></a>                                                                          
+                        <a href="" data-url="{% url 'person:url_company_delete' company.slug %}" id="button_modal_{{ company.slug }}" class='badge badge-danger' data-js="link_delete">deletar</a>
                         </form>
                       </td>                      
                     </tr>                 

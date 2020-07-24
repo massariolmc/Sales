@@ -3,11 +3,14 @@ from PIL import Image
 from django.core.files import File
 
 #Deleta as imagens em um update, caso não sejam iguais
-def delete_old_image(Model,pk, image):   
+def delete_old_image(Model,pk, image):
+    marc = 0   
     if pk:
         c = Model.objects.get(id=pk)        
-        if c.image != image:                     
-            c.image.delete(save=False)# O padrão é true se for deletar tudo. Se for deletar só a imagem ou arquivo é false       
+        if c.image != image:            
+            c.image.delete(save=False)# O padrão é true se for deletar tudo. Se for deletar só a imagem ou arquivo é false 
+            marc = 1            
+    return marc      
 
 #Comprime imagens
 def compress(image):
