@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from Sales.account.models import User
+from .compress_image import compress, delete_old_image
+from .slug_file import unique_uuid
 
 
 class Company(models.Model):
@@ -9,9 +11,9 @@ class Company(models.Model):
     cnpj = models.CharField(_('CNPJ'), max_length=14, unique=True, blank=False, null=False)
     number_state = models.CharField(_('Inscrição Estadual'), max_length=30, blank=True)
     email = models.EmailField(_('Email'), max_length=100, unique=True, blank=True)    
-    slug = models.SlugField(_('Atalho'), blank=True)
+    slug = models.SlugField(_('Atalho'), max_length=200, unique=True, blank=True)
     image = models.ImageField(upload_to = 'company/', verbose_name =
-            'Imagem', blank=True)
+            'Imagem', blank=True, max_length=200)
     description = models.TextField(_('Descrição'), blank=True)        
     address = models.CharField(_("Endereço"), max_length=100, blank=True)
     address_number = models.CharField(_("Número"), max_length=100, blank=True)
@@ -29,7 +31,27 @@ class Company(models.Model):
     class Meta:
         verbose_name = "Company"
         verbose_name_plural = "Companies"
-        ordering = ["name"]
+        ordering = ["name"]   
+
+    def save(self, *args, **kwargs):        
+        if self.id:
+            #Deleta a imagem antiga, caso não for igual
+            delete_old_image(self.__class__, self.id, self.image)            
+        else:
+            #Insere um valor para o Slug            
+            self.slug = unique_uuid()        
+        
+        # Comprime a imagem
+        if self.image:
+            new_image = compress(self.image)                
+            self.image = new_image           
+        # save
+        super().save(*args, **kwargs)
+
+    # Sobreescreve este metodo para delete imagens. Sem a imagem continua em media, mesmo deletando a pessoa do banco
+    def delete(self, *args, **kwargs):
+        self.image.delete()
+        super().delete(*args, **kwargs)
     
     def __str__(self):
         return self.name

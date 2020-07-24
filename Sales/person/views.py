@@ -3,15 +3,18 @@ from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
 from .forms import CompanyForm
 from .models import Company, Department
+from django.db import IntegrityError
 from crispy_forms.utils import render_crispy_form
 from django.template.loader import render_to_string
+from .compress_image import delete_old_image
 
-####### COMPANY
+####### COMPANY  ################
+
 def save_form(request,form,template_name, data, user_created=None):
     if request.method == 'POST':                                              
         if form.is_valid():
-            obj = form.save(commit=False)
-            if user_created:                
+            obj = form.save(commit=False)                                   
+            if user_created:                               
                 obj.user_created = user_created                              
             obj.save()
             return redirect('person:url_companies_list')
@@ -34,13 +37,12 @@ def company_create(request):
 def company_edit(request, pk):    
     template_name='company/form.html'
     data = {"title": "Editar"}    
-    company = get_object_or_404(Company, pk=pk)        
+    company = get_object_or_404(Company, pk=pk)           
     user_created = company.user_created # Esta linha faz com que o user_created não seja modificado, para mostrar quem criou esta pessoa    
-    if request.method == 'POST':                       
+    if request.method == 'POST':        
         form = CompanyForm(request.POST, request.FILES, instance=company)                
     else:
-        form = CompanyForm(instance=company)             
-    
+        form = CompanyForm(instance=company)       
     return save_form(request, form, template_name, data, user_created)
     
 def companies_list(request):
@@ -64,45 +66,32 @@ def company_detail(request, pk=None):
 
 def company_delete(request,pk):    
     company = get_object_or_404(Company, pk=pk)    
-    #if request.method == 'GET':        
-    #    try:
-    #        company.delete()
-    #        messages.success(request, 'Ação concluída com sucesso.')
-    #        return redirect('url_companies_list')
-    #    except IntegrityError:
-    #        messages.warning(request, 'Não é possível excluir. Esta Empresa possui departamento existentes.')
-    #        return redirect('url_companies_list') 
-    #else:
-    if request.method == "POST":
-        messages.warning(request, 'Ação teste POST.')    
-        return redirect('person:url_companies_list')
-    
-    messages.warning(request, 'Ação teste GET.')
-    return redirect('person:url_companies_list')
+    if request.method == 'POST':        
+       try:
+           company.delete()
+           messages.success(request, 'Ação concluída com sucesso.')
+           return redirect('person:url_companies_list')
+       except IntegrityError:
+           messages.warning(request, 'Não é possível excluir. Esta Empresa possui departamento existentes.')
+           return redirect('person:url_companies_list')    
 
-def company_delete_all(request):    
-    if request.method == "POST":
-        print("Valor do ac", request.POST["checkbox_selected"])
-        messages.warning(request, 'Ação teste POST.')
+def company_delete_all(request):
+    marc = 0    
+    if request.method == "POST":        
+        context = request.POST["checkbox_selected"].split(",")
+        context = [int(x) for x in context]      
+        if context:                
+            b = Company.objects.filter(id__in=context)            
+            for i in b:                
+                try:
+                    i.delete()
+                except IntegrityError:
+                    marc = 1                    
+    if marc == 0:
+        messages.success(request, 'Ação concluída com sucesso.')
     else:
-        print("get")
+        messages.warning(request, 'Não é possível excluir. Esta Empresa possui departamento existentes.')
     
     return redirect('person:url_companies_list')
     
-    # data = {}
-    # context = []
-    # context = request.POST.get("del","")
-    # print("valor do context", context)
-    # messages.success(request, 'entrei no delete all.')            
-    # context = context.replace("[","").replace("]","").replace('\"','')
-    # context = context.split(",")
-    # context = [int(x) for x in context]      
-    #if context:                
-    #     b = User.objects.filter(id__in=context).update(is_active=False)
-    #     print("Valor do b",b)
-    #companies = Company.objects.all()
-    #data['html_list'] = render_to_string('company/list.html', {'companies': companies})       
-    # return JsonResponse(data)    
-
 ########### FIM COMPANY############################
-

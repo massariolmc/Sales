@@ -8,14 +8,13 @@ class CompanyForm(ModelForm):
 
     class Meta:
         model = Company
-        fields = '__all__'
+        fields = ['name','fantasy_name','cnpj','number_state','email','image','description','address','address_number','neighborhood','city','state','zip_code','phone_1','phone_2','user_created','user_updated']
         widgets = {
             'name': TextInput(attrs={'class': 'form-control'}),
             'fantasy_name': TextInput(attrs={'class': 'form-control'}),
             'cnpj': TextInput(attrs={'class': 'form-control'}),
             'number_state': TextInput(attrs={'class': 'form-control'}),
-            'email': TextInput(attrs={'class': 'form-control'}),
-            'slug': TextInput(attrs={'class': 'form-control'}),
+            'email': TextInput(attrs={'class': 'form-control'}),            
             'image': FileInput(attrs={'class': 'form-control'}),
             'description': Textarea(attrs={'class': 'form-control'}),
             'address': TextInput(attrs={'class': 'form-control'}),
@@ -35,6 +34,14 @@ class CompanyForm(ModelForm):
         if tam > 0 and tam < 14:
             raise ValidationError("O CNPJ deve ter 14 digitos.")
         return cnpj
+    
+    def clean_image(self):        
+        image = self.cleaned_data['image']
+        if image:      
+            if image.size > 3000000:
+                raise ValidationError("Imagem muito grande. Tamanho máximo permitido: 3MB")
+        return image
+
 
     
     def __init__(self, *args, **kwargs):
