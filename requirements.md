@@ -1,0 +1,9 @@
+asgiref==3.2.8
+Django==3.0.7
+django-crispy-forms==1.9.1
+Pillow==7.2.0
+pycrypto==2.6.1
+python-decouple==3.3
+pytz==2020.1
+six==1.15.0
+sqlparse==0.3.1

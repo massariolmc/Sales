@@ -9,9 +9,11 @@ from Sales.account.forms import UserCustomCreateForm, UserChangeForm
 from Sales.account.models import User
 from django.db.models import Q
 
+
+
 # Create your views here.
-def home(request):
-    template_name = 'core/home.html'
+def home(request):    
+    template_name = 'core/home.html'   
     return render(request,template_name,{})
 
 
