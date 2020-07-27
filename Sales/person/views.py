@@ -1,5 +1,6 @@
 from django.shortcuts import render,get_object_or_404, get_list_or_404, redirect
 from django.http import JsonResponse, HttpResponse
+from django.utils.translation import ugettext as _
 from django.contrib import messages
 from .forms import CompanyForm
 from .models import Company, Department
@@ -7,7 +8,9 @@ from django.db import IntegrityError
 from crispy_forms.utils import render_crispy_form
 from django.template.loader import render_to_string
 from .compress_image import delete_old_image
-
+from django.conf import settings
+import os
+import json
 ####### COMPANY  ################
 
 def save_form(request,form,template_name, data, user_created=None):
@@ -29,7 +32,12 @@ def save_form(request,form,template_name, data, user_created=None):
 
 def company_create(request):
     template_name = 'company/form.html'    
-    data = {"title": "Cadastro de Empresas"}    
+    data = {
+            "title": _("Create Company"),
+            "back":_("Back"),
+            "save":_("Save"),
+            "clear":_("Clear"),
+        }    
     if request.method == 'POST':                       
         form = CompanyForm(request.POST, request.FILES)                
     else:
@@ -39,7 +47,12 @@ def company_create(request):
 
 def company_edit(request, slug):    
     template_name='company/form.html'
-    data = {"title": "Editar"}    
+    data = {
+            "title": _("Edit"),
+            "back":_("Back"),
+            "save":_("Save"),
+            "clear":_("Clear"),
+        }    
     company = get_object_or_404(Company, slug=slug)           
     user_created = company.user_created # Esta linha faz com que o user_created não seja modificado, para mostrar quem criou esta pessoa    
     if request.method == 'POST':        
@@ -53,7 +66,8 @@ def companies_list(request):
     companies = Company.objects.all()    
     context = {
         'companies': companies,
-        'title': "Empresas Cadastradas"       
+        'title': _("Registered Companies"),
+        'add': _("Add")      
     }
     return render(request,template_name,context)
 
@@ -61,7 +75,10 @@ def company_detail(request, slug):
     template_name = "company/detail.html"
     company = get_object_or_404(Company,slug=slug)
     context = {
-        'company': company
+        'company': company,
+        'title': _("Detail Info"),
+        'edit': _("Edit"),
+        'list_all': _("List All")
     }
     return render(request, template_name, context)
 
@@ -72,10 +89,10 @@ def company_delete(request, slug):
     if request.method == 'POST':        
        try:
            company.delete()
-           messages.success(request, 'Ação concluída com sucesso.')
+           messages.success(request, _('Completed successful.'))
            return redirect('person:url_companies_list')
        except IntegrityError:
-           messages.warning(request, 'Não é possível excluir. Esta Empresa possui departamento existentes.')
+           messages.warning(request, _('You cannot delete. This company has an existing department.'))
            return redirect('person:url_companies_list')    
 
 def company_delete_all(request):
@@ -91,10 +108,21 @@ def company_delete_all(request):
                 except IntegrityError:
                     marc = 1                    
     if marc == 0:
-        messages.success(request, 'Ação concluída com sucesso.')
+        messages.success(request, _('Completed successful.'))
     else:
-        messages.warning(request, 'Não é possível excluir. Esta Empresa possui departamento existentes.')
+        messages.warning(request, _('You cannot delete. This company has an existing department.'))
     
     return redirect('person:url_companies_list')
+
+def company_translate_js(request):    
+    if request.method == "GET":
+        module_dir = os.path.dirname(__file__)  # get current directory
+        file_path = os.path.join(module_dir, 'templates/default')        
+        translate = ""        
+        with open(file_path+"/translate_data_tables-"+request.LANGUAGE_CODE+".json", 'r') as arquivo:
+            for linha in arquivo:
+                translate += linha        
+        obj = json.loads(translate)        
+    return JsonResponse(obj)
     
 ########### FIM COMPANY############################

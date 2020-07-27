@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% load i18n %}
 
 {% block css %}
   <!-- iCheck for checkboxes and radio inputs -->
@@ -27,7 +28,7 @@
                 <div class="col-sm-6">
                   <span class="float-right">
                     <a href="{% url 'person:url_company_create' %}">
-                      <button type="button" class="btn btn-success">Adicionar
+                      <button type="button" class="btn btn-success">{{ add }}
                       </button>
                     </a>
                   </span>
@@ -39,7 +40,7 @@
               <div class="table-responsive">
                 {% include 'company/_table.html' %}
               </div>
-              <button data-js="click_checkbox" class="btn btn-danger" ><i class="fas fa-minus-circle fa-1x"></i>Remover</button>
+              <button data-js="click_checkbox" class="btn btn-danger" ><i class="fas fa-minus-circle fa-1x"></i>{% trans "Remove" %}</button>
             </div>
              
 {% include 'default/_modal_delete.html' %}

@@ -3,6 +3,7 @@ from .models import Company, Department
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Row, Column, Button, ButtonHolder, HTML, Hidden
 from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
 
 class CompanyForm(ModelForm):
 
@@ -25,6 +26,10 @@ class CompanyForm(ModelForm):
             'zip_code': TextInput(attrs={'class': 'form-control'}),
             'phone_1': TextInput(attrs={'class': 'form-control'}),                        
             'phone_2': TextInput(attrs={'class': 'form-control'}),                                    
+        }
+        error_message = {
+            'cnpj': _("This field CNPJ exactly needs 14 digits. "),
+            'image': _("Maximum size allowed")
         }        
         
     #VALIDAÇÃO
@@ -32,14 +37,14 @@ class CompanyForm(ModelForm):
         cnpj = self.cleaned_data['cnpj']
         tam = len(cnpj)        
         if tam > 0 and tam < 14:
-            raise ValidationError("O CNPJ deve ter 14 digitos.")
+            raise ValidationError(self.error_message.cnpj)
         return cnpj
     
     def clean_image(self):        
         image = self.cleaned_data['image']
         if image:      
             if image.size > 3000000:
-                raise ValidationError("Imagem muito grande. Tamanho máximo permitido: 3MB")
+                raise ValidationError(self.error_message.image)
         return image
 
 
@@ -87,13 +92,13 @@ class CompanyForm(ModelForm):
                  <div class="row">    
                     <div class="col-sm-6">
                         <span class="float-left">
-                            <button type="submit" class="btn btn-primary">Salvar</button>  	  
-                            <button type="reset" class="btn btn-secondary">Limpar formulário</button>
+                            <button type="submit" class="btn btn-primary">{{ save }}</button>  	  
+                            <button type="reset" class="btn btn-secondary">{{ clear }}</button>
                         </span>
                     </div>
                     <div class="col-sm-6">
                         <span class="float-right">
-                            <a href="{% url 'person:url_companies_list'%}" class="btn btn-warning">Voltar</a>
+                            <a href="{% url 'person:url_companies_list'%}" class="btn btn-warning">{{ back }}</a>
                         </span>  
                     </div>
                 </div>'''

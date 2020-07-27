@@ -12,6 +12,7 @@ urlpatterns = [
     path('company/<slug:slug>/edit', views.company_edit, name='url_company_edit'),
     path('company/<slug:slug>/delete', views.company_delete, name='url_company_delete'),
     path('company/delete_all/', views.company_delete_all, name='url_company_delete_all'),
+    path('company/translate-js/', views.company_translate_js, name='url_company_translate_js'),
     
 ]
 if settings.DEBUG:
