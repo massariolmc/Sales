@@ -1,10 +1,11 @@
 (function(doc,win){
     doc.addEventListener("DOMContentLoaded", function() {
         'use strict';                
+        var $click_checkbox = doc.querySelector('[data-js="click_checkbox"]');               
         var $modal_link = doc.querySelector('[data-js="modal_link_delete"]');               
         var $form_modal = doc.querySelector('[name="form_modal_delete_all"]');
         var $form_modal_hidden_values_checkbox = doc.querySelector('[data-js="hidden_values_checkbox"]');
-
+        
         function handleClickDelete(){
             var elementoAtual = doc.querySelectorAll('[data-js="link_delete"');
             Array.prototype.slice.call(elementoAtual).forEach(function(pegaElementoAtual){
@@ -41,7 +42,9 @@
                 $('[data-js="modal_checkbox"]').modal();
             }
             else{
-                $form_modal_hidden_values_checkbox.setAttribute('value',ac);                
+                
+                $form_modal_hidden_values_checkbox.setAttribute('value',ac);
+                $form_modal.setAttribute('action',$click_checkbox.getAttribute('data-url'));                
                 $('[data-js="modal_delete_all"]').modal();
             }
         }        

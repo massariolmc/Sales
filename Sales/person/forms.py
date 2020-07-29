@@ -1,5 +1,5 @@
-from django.forms import ModelForm, TextInput, Textarea, DateInput, Select, SelectDateWidget, HiddenInput, DateTimeInput, EmailInput, FileInput
-from .models import Company, Department
+from django.forms import ModelForm, TextInput, Textarea, NumberInput, DateInput, Select, SelectDateWidget, HiddenInput, DateTimeInput, EmailInput, FileInput, CheckboxInput
+from .models import Company, Department, PersonType
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Row, Column, Button, ButtonHolder, HTML, Hidden
 from django.core.exceptions import ValidationError
@@ -27,27 +27,27 @@ class CompanyForm(ModelForm):
             'phone_1': TextInput(attrs={'class': 'form-control'}),                        
             'phone_2': TextInput(attrs={'class': 'form-control'}),                                    
         }
-        error_message = {
-            'cnpj': _("This field CNPJ exactly needs 14 digits. "),
-            'image': _("Maximum size allowed")
-        }        
+        # error_message = {
+        #     'cnpj': _("This field CNPJ exactly needs 14 digits. "),
+        #     'image': _("Maximum size allowed")
+        # }        
         
     #VALIDAÇÃO
     def clean_cnpj(self):
         cnpj = self.cleaned_data['cnpj']
+        msg =  _("This field CNPJ exactly needs 14 digits. ")
         tam = len(cnpj)        
         if tam > 0 and tam < 14:
-            raise ValidationError(self.error_message.cnpj)
+            raise ValidationError(msg)
         return cnpj
     
     def clean_image(self):        
         image = self.cleaned_data['image']
+        msg =  _("Maximum size allowed")
         if image:      
             if image.size > 3000000:
-                raise ValidationError(self.error_message.image)
+                raise ValidationError(msg)
         return image
-
-
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)        
@@ -106,3 +106,57 @@ class CompanyForm(ModelForm):
             
             
         )
+
+
+class DepartmentForm(ModelForm):
+
+    class Meta:
+        model = Department
+        fields = ['name','abbreviation','company','description']
+        widgets = {
+            'name': TextInput(attrs={'class': 'form-control'}),
+            'abbreviation': TextInput(attrs={'class': 'form-control'}),
+            'description': Textarea(attrs={'class': 'form-control'}),
+            'company': Select(attrs={'class': 'form-control'}),                                                                     
+        }             
+        
+    #VALIDAÇÃO    
+    def clean(self):        
+        name = self.cleaned_data['name']           
+        company_id = self.cleaned_data['company']                
+        msg = _("There is a name for this Company. Choose other name. ")
+        if self.instance.id:
+            n = Department.objects.filter(name__iexact=name, company_id=self.instance.company_id).exclude(id=self.instance.id).exists()#Verifica se o nome já existe        
+            
+        else:            
+            n = Department.objects.filter(name__iexact=name, company_id=company_id).exists()#Verifica se o nome já existe        
+            
+        if n:            
+            self.add_error('name', msg)
+
+class PersonTypeForm(ModelForm):
+
+    class Meta:
+        model = PersonType
+        fields = ['name','max_discount','company','description','block_discount']
+        widgets = {
+            'name': TextInput(attrs={'class': 'form-control'}),
+            'max_discount': NumberInput(attrs={'class': 'form-control'}),            
+            'company': Select(attrs={'class': 'form-control'}),        
+            'description': Textarea(attrs={'class': 'form-control'}),
+            #'block_discount': CheckboxInput(attrs={'class': 'form-control'}),                                                             
+        }             
+        
+    #VALIDAÇÃO    
+    def clean(self):        
+        name = self.cleaned_data['name']           
+        company_id = self.cleaned_data['company']                
+        msg = _("There is a person type for this Company. Choose other name. ")
+        if self.instance.id:
+            n = PersonType.objects.filter(name__iexact=name, company_id=self.instance.company_id).exclude(id=self.instance.id).exists()#Verifica se o nome já existe        
+            
+        else:            
+            n = PersonType.objects.filter(name__iexact=name, company_id=company_id).exists()#Verifica se o nome já existe        
+            
+        if n:            
+            self.add_error('name', msg)

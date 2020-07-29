@@ -27,7 +27,7 @@
                 </div>
                 <div class="col-sm-6">
                   <span class="float-right">
-                    <a href="{% url 'person:url_company_create' %}">
+                    <a href="{% url 'person:url_department_create' %}">
                       <button type="button" class="btn btn-success">{{ add }}
                       </button>
                     </a>
@@ -38,9 +38,9 @@
 
             <div class="card-body">
               <div class="table-responsive">
-                {% include 'company/_table.html' %}
+                {% include 'department/_table.html' %}
               </div>
-              <button data-url="{% url 'person:url_company_delete_all' %}" data-js="click_checkbox" class="btn btn-danger" ><i class="fas fa-minus-circle fa-1x"></i>{% trans "Remove" %}</button>
+              <button data-url="{% url 'person:url_department_delete_all' %}" data-js="click_checkbox" class="btn btn-danger" ><i class="fas fa-minus-circle fa-1x"></i>{% trans "Remove" %}</button>
             </div>
              
 {% include 'default/_modal_delete.html' %}

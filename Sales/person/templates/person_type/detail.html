@@ -1,0 +1,75 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load i18n %}
+
+
+{% block content %}
+
+<div class="card shadow mb-4">
+    <div class="card-header ">
+        <h6 class="font-weight-bold text-primary"> {{ title }}</h6>
+    </div>
+    <div class="card-body">
+    <div class="row">
+        <div class="col-sm-4">
+            <a href="{% url 'person:url_person_types_list'%}" class="btn btn-info float-left">{{ list_all }}</a>
+        </div>
+        <div class="col-sm-4">      
+        <h3><strong>{{ person_type.name }}</strong></h3>
+        
+        </div>
+        <div class="col-sm-4">
+            <span class="float-right">
+                <a href="{% url 'person:url_person_type_edit' person_type.slug %}">
+                    <button type="button" class="btn btn-success">{{ edit }}
+                    </button>
+                </a>
+            </span>
+        </div>
+    </div>
+    </br>
+        <div class="col-sm-12">
+            <table class="table table-user-information">
+                <tbody>
+                    <tr>
+                        <th class="text-right">{% trans "Type Person" %}</th>
+                        <td>{{ person_type.name }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right">{% trans "Max Discount" %}</th>
+                        <td>{{ person_type.max_discount }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right">{% trans "Company" %}</th>                       
+                        <td>{{ person_type.company }}</td>                       
+                    </tr>
+                    <tr>
+                        <th class="text-right">{% trans "Block Discount" %}</th>
+                        <td>{% if person_type.block_discount %} Ativo {% else %} Inativo {% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right">{% trans "Description" %}</th>
+                        <td>{{ person_type.description }}</td>
+                    </tr>                                                                                          
+                    <tr>
+                        <th class="text-right">{% trans "Created by" %}:</th>
+                        <td>{{ person_type.user_created }} - {{ person_type.created_at }}</td>
+                    </tr>                    
+                    <tr>
+                        <th class="text-right">{% trans "Updated by" %}</th>
+                        <td>{{ person_type.user_updated }} - {{ person_type.updated_at }}</td>
+                    </tr>   
+                                                        
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}
+
+{% block js %}
+<script src="{% static 'core/plugins/jquery/jquery.mask.min.js'%}"></script>
+<script src="{% static 'default/js/jquery_mask.js'%}"></script>
+{% endblock js %}

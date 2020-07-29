@@ -1,0 +1,41 @@
+{% load static %}
+{% load i18n %}
+
+
+<table data-js="dataTables" class="table table-bordered" data-lang="{% url 'person:url_person_type_translate_js' %}">
+  <thead>
+    <tr class="text-sm-center">
+      <th><div class="icheck-danger d-inline">
+        <input type="checkbox" data-js="check_all" id="checkbox_main">
+        <label for="checkbox_main">{% trans "Choose" %}
+        </label>
+        </div></th>
+      <th>{% trans "Name" %}</th>
+      <th>{% trans "Company" %}</th>
+      <th>{% trans "Max Discount" %}</th>                      
+      <th>{% trans "Block" %}</th>   
+      <th>{% trans "Options" %}</th>                                         
+    </tr>
+  </thead>                  
+  <tbody>
+    {% for person_type in person_types %}
+    <tr class="text-sm-center">
+      <td><div class="icheck-danger d-inline">
+        <input type="checkbox" name="check_id" value="{{ person_type.slug }}" id="checkbox_{{ person_type.slug }}">
+        <label for="checkbox_{{ person_type.slug }}">
+        </label>
+        </div></td>
+      <td>{{ person_type.name }}</td>
+      <td>{{ person_type.company }}</td>                                
+      <td>{{ person_type.max_discount }}%</td>                                                                       
+      <td>{% if person_type.block_discount %} Ativo {% else %} Inativo {% endif %}</td>                                       
+      <td class="text-center">                        
+        <a href="{% url 'person:url_person_type_edit' person_type.slug %}"><span class='badge badge-warning'>{% trans "edit" %}</span></a>
+        <a href="{% url 'person:url_person_type_detail' person_type.slug %}"><span class='badge badge-info'>{% trans "details" %}</span></a>                                                                          
+        <a href="" data-url="{% url 'person:url_person_type_delete' person_type.slug %}" id="button_modal_{{ person_type.slug }}" class='badge badge-danger' data-js="link_delete">{% trans "delete" %}</a>
+        </form>
+      </td>                      
+    </tr>                 
+    {% endfor %}   
+  </tbody>                  
+</table>                

@@ -20,12 +20,13 @@ from django.utils.translation import gettext_lazy as _
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('i18n/', include('django.conf.urls.i18n')),
+    path('admin/', admin.site.urls),  
+    path('accounts/', include('django.contrib.auth.urls')),  
+    path('',include('Sales.core.urls')),
+    path('',include('Sales.person.urls')),  
 ]
-urlpatterns += i18n_patterns(
-        path('accounts/', include('django.contrib.auth.urls')),    
-        path('',include('Sales.core.urls')),
-        path('',include('Sales.person.urls')),
-        prefix_default_language=True
-    )
+# urlpatterns += i18n_patterns(
+       
+#     prefix_default_language=True
+#     )

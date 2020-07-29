@@ -73,31 +73,25 @@ class Department(models.Model):
         verbose_name_plural = _("Departments")
         ordering = ["name"]
     
-    def __str__(self):
-        return self.name
-
-class MaxDiscount(models.Model):
-    name = models.CharField(_("Name"), max_length=100, blank=False, null= False)
-    discount = models.CharField(_("Discount"), max_length=100, blank=False, null= False)    
-    description = models.TextField(_('Description'), blank=True)  
-    slug = models.SlugField(_('Slug'), blank=True)          
-    user_created = models.ForeignKey(User, related_name="max_discount_user_created_id", verbose_name=_("Created by"), blank=True, on_delete=models.PROTECT)
-    user_updated = models.ForeignKey(User, related_name="max_discount_user_updated_id", verbose_name=_("Updated by"), blank=True, on_delete=models.PROTECT)
-    created_at = models.DateTimeField(_('Created at'),auto_now_add=True)
-    updated_at = models.DateTimeField(_('Updated at'), auto_now=True)
-    class Meta:
-        verbose_name = _("MaxDiscount")
-        verbose_name_plural = _("MaxDiscounts")
-        ordering = ["name"]
+    def save(self, *args, **kwargs):        
+                    
+        if not self.id:
+            #Insere um valor para o Slug            
+            self.slug = unique_uuid(self.__class__)               
+        # save
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return self.name
 
+
 class PersonType(models.Model):
     name = models.CharField(_("Name"), max_length=100, blank=False, null= False)        
     description = models.TextField(_('Description'), blank=True)  
-    max_discount = models.ForeignKey(MaxDiscount, verbose_name=_("Max Discount"), on_delete=models.PROTECT)
-    slug = models.SlugField(_('Slug'), blank=True)          
+    max_discount = models.PositiveIntegerField(_('Discount Max'), blank=False, null=False)
+    slug = models.SlugField(_('Slug'), blank=True) 
+    block_discount = models.BooleanField(_('Block Discount'), default=True, blank=False, null=False)
+    company = models.ForeignKey(Company, verbose_name=_("Company"), default=1, on_delete=models.PROTECT, blank=False, null= False)         
     user_created = models.ForeignKey(User, related_name="person_type_user_created_id", verbose_name=_("Created by"), blank=True, on_delete=models.PROTECT)
     user_updated = models.ForeignKey(User, related_name="person_type_user_updated_id", verbose_name=_("Updated by"), blank=True, on_delete=models.PROTECT)
     created_at = models.DateTimeField(_('Created at'),auto_now_add=True)
@@ -106,6 +100,14 @@ class PersonType(models.Model):
         verbose_name = _("PersonType")
         verbose_name_plural = _("PersonTypes")
         ordering = ["name"]
+    
+    def save(self, *args, **kwargs):        
+                    
+        if not self.id:
+            #Insere um valor para o Slug            
+            self.slug = unique_uuid(self.__class__)               
+        # save
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return self.name

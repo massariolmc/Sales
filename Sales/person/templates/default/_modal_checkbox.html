@@ -15,7 +15,7 @@
             </div>
             <div class="modal-footer justify-content-between" data-js="insert_button">
                 <button type="button" class="btn btn-outline-light" data-dismiss="modal">{% trans "No"%}</button>
-                <form name="form_modal_delete_all" method="POST" action="{% url 'person:url_company_delete_all' %}">
+                <form name="form_modal_delete_all" method="POST">
                     {% csrf_token %}
                     <input type="hidden" name="checkbox_selected" data-js="hidden_values_checkbox">
                     <button type="submit" class="btn btn-outline-light" data-js="modal_link_delete_all">{% trans "Yes"%}</button>
