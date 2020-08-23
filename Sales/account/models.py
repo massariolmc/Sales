@@ -11,6 +11,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.conf import settings
 import datetime
+from .slug_file import unique_uuid
 # Create your models here.
 
 class UserManager(BaseUserManager):    
@@ -45,6 +46,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_trusty = models.BooleanField(_('trusty'), default=False, help_text=_('Designates whether this user has confirmed his account.'))
     date_login = models.DateTimeField(_('date login'), blank=True, null=True)
     date_logout = models.DateTimeField(_('date logout'), blank=True, null=True)
+    slug = models.SlugField(_('Slug'), max_length=200, blank=True)
     created_at = models.DateTimeField(_('Created at'),auto_now_add=True, auto_now=False)
     updated_at = models.DateTimeField(_('Updated at'), auto_now_add=False, auto_now=True)
     user_created = models.ForeignKey('self', related_name="user_user_created_id", verbose_name=_("Created by "), null=True, on_delete=models.PROTECT)
@@ -60,7 +62,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = _('users')
     
     def __str__(self):
-        return '{} {} '.format(self.first_name, self.last_name)
+        #return '{} {} '.format(self.first_name, self.last_name)        
+        return '{} '.format(self.username)        
         
     def get_full_name(self):
         full_name = '%s %s' % (self.first_name, self.last_name)
@@ -71,6 +74,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     def email_user(self, subject, message, from_email=None):
         send_mail(subject, message, from_email, [self.email])
+
+    def save(self, *args, **kwargs):        
+                    
+        if not self.id:
+            #Insere um valor para o Slug            
+            self.slug = unique_uuid(self.__class__)               
+        # save
+        super().save(*args, **kwargs)
 
 
 def login_user(sender, request, user, **kwargs):

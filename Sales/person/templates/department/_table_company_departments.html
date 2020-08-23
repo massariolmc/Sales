@@ -1,0 +1,17 @@
+{% load static %}
+{% load i18n %}
+
+{% for department in departments %}
+<tr class="text-sm-center">
+<td>{{ department.name }}</td>
+<td>{{ department.abbreviation }}</td>                                
+<td><button type="button" class="btn btn-primary btn-sm js-positions-department" data-url="{% url 'person:url_position_create' department.slug %}"><i class="fas fa-folder"></i>{% trans "Positions" %}</span></button></td>                                                                      
+<td class="text-center">                        
+    <button type="button" class="btn btn-warning btn-sm js-update-department" data-url="{% url 'person:url_department_edit' department.slug %}"><i class="fas fa-pencil-alt"></i>{% trans "edit" %}</span></button>
+    <button type="button" class="btn btn-info btn-sm js-detail-department" data-url="{% url 'person:url_department_detail' department.slug %}"><i class="fas fa-folder"></i>{% trans "details" %}</span></button>                                                                          
+    <button type="button" class="btn btn-danger btn-sm js-delete-department" data-url="{% url 'person:url_department_delete' department.slug %}"><i class="fas fa-trash"></i></span>{% trans "delete" %}</button>    
+</td>                      
+</tr>                 
+{% endfor %}   
+            
+  

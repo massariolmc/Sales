@@ -1,6 +1,6 @@
 $(document).ready(function () {
     'use strict'; 
-    var url = document.querySelector("table").getAttribute("data-lang");          
+    var url = $("table").attr("data-lang");          
     $('[data-js="dataTables"]').DataTable({    
       "paging": true,
       "lengthChange": true,

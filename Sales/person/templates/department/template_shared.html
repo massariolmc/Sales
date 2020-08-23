@@ -1,0 +1,288 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block css %}
+  <!-- iCheck for checkboxes and radio inputs -->
+  <link rel="stylesheet" href="{% static 'core/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+  <!-- DATA TABLES -->
+  <link rel="stylesheet" href="{% static 'core/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+    <!-- Toastr -->
+  <link rel="stylesheet" href="{% static 'core/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
+  <link rel="stylesheet" href="{% static 'core/plugins/toastr/toastr.min.css' %}">
+
+{% endblock css %}
+
+{% block content %}
+
+{% block title %}
+{% endblock title %}
+
+{% include 'default/_messages.html' %}
+
+          <!-- DataTales Example -->
+          <div class="card mb-0">
+            <div class="card-header">
+              <div class="row">
+                <div class="col-sm-12">
+                  <h6 class="m-0 font-weight-bold text-primary text-center">{{ company.name }}</h6>
+                </div>
+              </div> 
+              <hr class="divider">           
+              <div class="row float-right">                               
+                  <button class="btn btn-success" data-js="load_form_department" data-url="{% url 'person:url_department_create' company.slug %}">
+                     {% trans 'Add new Department'%}                     
+                  </button>                                
+              </div>
+            </div>
+          
+            <div class="card-body">
+                <div id="row_search_lines" class="row mb-2">
+                  <div class="col-sm-6">
+                    <div class="input-group input-group-sm" style="width: 150px;">
+                        <select data-js="js-get-lines" class="form-control js-select" id="sel">            
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>                        
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="input-group input-group-sm float-right" style="width: 150px;">
+                        <input type="text" name="table_search" class="form-control js-search" placeholder={% trans 'Search'%} data-js="js-get-text" data-url="{% url 'person:url_company_departments' company.slug %}" >
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                  </div>    
+                </div>                     
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="card card-info">   
+                      <div class="card-header">
+                          <h3 class="card-title">{% trans "Departments" %}</h3>
+                      </div>
+                      <table id="department-table" class="table table-bordered" >
+                          <thead>
+                              <tr class="text-sm-center">                             
+                              <th>{% trans "Name" %}</th>
+                              <th>{% trans "Abbreviation" %}</th>
+                              <th>{% trans "Positions" %}</th>                      
+                              <th>{% trans "Options" %}</th>                                         
+                              </tr>
+                      </thead> 
+                      <tbody>                  
+                        {% include 'department/_table_company_departments.html' %}  
+                      </tbody>                       
+                      </table>
+                      <div class="card-footer clearfix ">
+                        <div id="click_page">
+                          {% include 'department/_paginate.html' %}
+                        </div>    
+                      </div>
+                    </div>
+                  </div>                  
+                </div>
+                    
+            </div>
+          </div>
+
+<div class="modal fade" id="modal-department">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    </div>
+  </div>
+</div>
+
+             
+{% endblock content %}
+
+{% block js %}
+
+<script src="{% static 'core/plugins/sweetalert2/sweetalert2.min.js'%}"></script>
+<script src="{% static 'core/plugins/toastr/toastr.min.js'%}"></script>
+
+<script>
+
+$(function () {  
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000
+    });
+
+    function openToastSuccess() {
+      var message = $('[data-js="message_success"]').attr('value')     
+      toastr.success(message)    
+    };
+
+  /* Functions */
+
+  var loadForm = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {                
+        $("#modal-department").modal("show");
+      },
+      success: function (data) {        
+        $("#modal-department .modal-content").html(data.html_form);
+      }
+    });
+  };
+
+  var saveForm = function () {
+    var form = $(this);
+    $.ajax({
+      url: form.attr("action"),
+      data: form.serialize(),
+      type: form.attr("method"),
+      dataType: 'json',
+      success: function (data) {        
+        if (data.form_is_valid) {
+          $("#department-table tbody").html(data.html_list);
+          $("#modal-department").modal("hide");          
+          openToastSuccess();
+          handleShow();         
+        }
+        else {
+          $("#modal-department .modal-content").html(data.html_form);
+        }
+      }
+    });
+    return false;
+  };
+
+  var loadDetail = function () {
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {                
+        $("#modal-department").modal("show");
+      },
+      success: function (data) {        
+        $("#modal-department .modal-content").html(data.html_form);
+      }
+    });
+  };
+
+var requestSearch = function(text,url,page,lines){
+    $.ajax({
+        type: "GET",                
+        url: url,
+        data: {'q': text, 'page': page, 'lines':lines },
+        dataType: "json",
+        beforeSend : function(){
+            
+        },
+        success: function(data){                                
+            if (data.form_is_valid) {
+              $("#department-table tbody").html(data.html_list);              
+              $("#click_page").html(data.html_paginate);              
+            }
+            else {
+              console.log("Retorno não valido");
+            }                                
+        },
+        failure: function(data){
+            
+        },
+    });                         
+}
+
+  var handleSearch = function(){
+    var search = $(this);
+    console.log("valores", search.val())    
+    var page = $(location).attr('href');    
+    var marc = page.indexOf("=")
+    if (marc != -1) {
+      page = page.split("=")[1]      
+    }
+    else{
+      page = 1
+    }   
+    console.log("valor page",page)
+    var url = search.attr("data-url")
+    var text = search.val()
+    var lines = $('[data-js="js-get-lines"]').val();
+    requestSearch(text, url, page, lines)
+  }
+
+  
+var handlePage = function(e){
+    e.preventDefault();
+    var page = $(this);    
+    console.log("Valor",page.attr('href').indexOf('='));
+
+    if ( page.attr('href').indexOf('=') != -1){
+      page = page.attr('href').split('=')[1]
+    }
+    else{
+      page = 1
+    }    
+    console.log("page",page);
+    var text = $('[data-js="js-get-text"]').val();
+    var url = $('[data-js="js-get-text"]').attr('data-url');
+    var lines = $('[data-js="js-get-lines"]').val();
+    requestSearch(text, url, page, lines)
+}
+
+var handleShow = function(){  
+  var select = $('[data-js="js-get-lines"]').val();  
+  var text = $('[data-js="js-get-text"]').val();
+  var url = $('[data-js="js-get-text"]').attr('data-url');
+  var page = 1;
+  var lines = select
+  requestSearch(text, url, page, lines)
+}
+
+  var savePositionForm = function () {    
+    var form = $(this);
+    $.ajax({
+      url: form.attr("action"),
+      data: form.serialize(),
+      type: form.attr("method"),
+      dataType: 'json',
+      success: function (data) {        
+        if (data.form_is_valid) {          
+          $("#modal-department").modal("hide");          
+          openToastSuccess();  
+        }        
+      }
+    });
+    return false;
+  };
+
+  $('[data-js="load_form_department"]').click(loadForm);
+  $("#modal-department").on("submit", ".js-department-create-form", saveForm);
+
+  $("#department-table").on("click", ".js-update-department", loadForm);  
+  $("#modal-department").on("submit", ".js-department-update-form", saveForm);
+
+  $("#department-table").on("click", ".js-delete-department", loadForm);
+  $("#modal-department").on("submit", ".js-delete-form", saveForm);
+
+  $("#department-table").on("click", ".js-detail-department", loadDetail);
+
+  $("#row_search_lines").on("input", ".js-search", handleSearch);
+  $("#click_page").on("click", ".page-link", handlePage);
+  $("#row_search_lines").on("change", ".js-select", handleShow);
+
+
+  $('#department-table').on("click", ".js-positions-department", loadForm);
+  $("#modal-department").on("submit", ".js-position-create-form", savePositionForm);
+
+
+});
+
+</script>  
+
+{% endblock js %}

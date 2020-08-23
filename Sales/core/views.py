@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.template.loader import render_to_string
 
 # USER
-from Sales.account.forms import UserCustomCreateForm, UserChangeForm
+from Sales.account.forms import UserCreationForm, UserChangeForm
 from Sales.account.models import User
 from django.db.models import Q
 
@@ -17,15 +17,21 @@ def home(request):
     return render(request,template_name,{})
 
 
-def signup(request):
+def signup_create(request):
+    context = {
+        "title": _("Create User"),
+        "back":_("Back"),
+        "save":_("Save"),
+        "clear":_("Clear"),
+    } 
     if request.method == 'POST':
-        form = UserCustomCreateForm(request.POST)
+        form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('signup:url_signup_list')
     else:
-        form = UserCustomCreateForm()
-       
+        form = UserCreationForm()
+    context['form'] = form 
     return render(request, 'core/signup_form.html',{'form': form})
 
 def signup_list(request):
