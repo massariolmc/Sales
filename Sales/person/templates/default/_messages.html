@@ -9,3 +9,10 @@
     </div>
     {% endfor %}
 {% endif %}
+
+
+<input type="hidden" value="{% trans 'Successful action.'%}" data-js="message_success"  />
+
+<input type="hidden" value="{% trans ' Alert! Action not performed'%}" data-js="message_error"  />
+
+<input type="hidden" value="{% trans 'Atention!'%}" data-js="message_warning"  />

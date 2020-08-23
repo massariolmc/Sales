@@ -2,7 +2,7 @@
 {% load i18n %}
 
 
-<table data-js="dataTables" class="table table-bordered" data-lang="{% url 'person:url_company_translate_js' %}">
+<table data-js="dataTables" class="table table-bordered" data-lang="{% url 'person:url_translate_datables_js' %}">
   <thead>
     <tr class="text-sm-center">
       <th><div class="icheck-danger d-inline">
@@ -13,7 +13,8 @@
       <th>{% trans "Name" %}</th>
       <th>{% trans "Fantasy name" %}</th>
       <th>{% trans "CNPJ" %}</th>                      
-      <th>{% trans "Email" %}</th>   
+      <th>{% trans "Email" %}</th> 
+      <th>{% trans "Departaments List" %}</th>   
       <th>{% trans "Options" %}</th>                                         
     </tr>
   </thead>                  
@@ -29,7 +30,10 @@
       <td>{{ company.fantasy_name }}</td>                                
       <td>{{ company.cnpj }}</td>                                                                       
       <td>{{ company.email }}</td>                                       
-      <td class="text-center">                        
+      <td class="text-center"> 
+        <a href="{% url 'person:url_company_departments' company.slug %}"><span class='badge badge-secondary'>{% trans "departments" %}</span></a>  
+      </td>                      
+      <td class="text-center"> 
         <a href="{% url 'person:url_company_edit' company.slug %}"><span class='badge badge-warning'>{% trans "edit" %}</span></a>
         <a href="{% url 'person:url_company_detail' company.slug %}"><span class='badge badge-info'>{% trans "details" %}</span></a>                                                                          
         <a href="" data-url="{% url 'person:url_company_delete' company.slug %}" id="button_modal_{{ company.slug }}" class='badge badge-danger' data-js="link_delete">{% trans "delete" %}</a>

@@ -16,15 +16,12 @@
       </div>
       <!-- /.card-header -->
       <!-- form start -->
-      <form method="post">
+      
         <div class="card-body">
-          {% csrf_token %}
-          {{ form|crispy }}
+         
+          {% crispy form %}
         </div>
-        <div class="card-footer">
-          <button type="submit" class="btn btn-primary">Salvar</button>
-        </div>
-      </form>
+        
     </div>
   </div>
 </div>

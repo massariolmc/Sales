@@ -1,0 +1,129 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load i18n %}
+
+
+{% block content %}
+
+<div class="card shadow mb-4">
+    <div class="card-header ">
+        <h6 class="font-weight-bold text-primary"> {{ title }}</h6>
+    </div>
+    <div class="card-body">
+    <div class="row">
+        <div class="col-sm-4">
+            <a href="{% url 'person:url_people_list'%}" class="btn btn-info float-left">{{ list_all }}</a>
+        </div>
+        <div class="col-sm-4">      
+        {% if person.image %}<img class="img-profile rounded-circle" src="{{ person.image.url }}" style="width:100px">
+        {% else %}    <h3><strong>{{ person.name }}</strong></h3>
+         {% endif %}
+        </div>
+        <div class="col-sm-4">
+            <span class="float-right">
+                <a href="{% url 'person:url_person_edit' person.slug %}">
+                    <button type="button" class="btn btn-success">{{ edit }}
+                    </button>
+                </a>
+            </span>
+        </div>
+    </div>
+    </br>
+        <div class="col-sm-12">
+            <table class="table table-user-information">
+                <tbody>
+                    <tr>
+                        <th class="text-right">{% trans "Name /  User" %}</th>
+                        <td>{{ person.name }} / {{ person.user.username }}</td>
+                    </tr>                    
+                    <tr>
+                        <th class="text-right">{% trans "Birthday" %}</th>
+                        <td>{{ person.birthday }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right">{% trans "Gender" %}</th>                       
+                        <td>{{ person.gender }}</td>                       
+                    </tr>
+                    <tr>
+                        <th class="text-right">{% trans "Parent's name" %}</th>
+                        <td>{{ person.fathers_name }} / {{ person.mothers_name }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right">{% trans "CPF" %}</th>
+                        <td>{{ person.user.cpf }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right">{% trans "Email" %}</th>
+                        <td>{{ person.user.email }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right">{% trans "Active" %}</th>
+                        <td>{% if person.user.is_active %} Sim {% else %} Não {% endif %}</td>
+                    </tr>  
+                    <tr>
+                        <th class="text-right">{% trans "Date login" %}</th>
+                        <td>{{ person.user.date_login }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right">{% trans "Date Logout" %}</th>
+                        <td>{{ person.user.date_logout }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right">{% trans "RG" %}</th>
+                        <td>{{ person.rg }} - {{ person.rg_exped }}/{{ person.rg_uf }}</td>
+                    </tr>                    
+                    <tr>
+                        <th class="text-right">{% trans "Birthplace" %}</th>
+                        <td>{{ person.birthplace }}/{{ person.birthplace_state }}</td>
+                    </tr>                   
+
+                    <tr>
+                        <th class="text-right">{% trans "Marital Status" %}</th>
+                        <td>{{ person.maritalstatus }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right">{% trans "Pis/Pasep" %}</th>
+                        <td>{{ person.pis_pasep }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right">{% trans "Work Portifolio" %}</th>                       
+                        <td>{% trans "Number: "%} {{ person.work_portifolio_number }} - {% trans "Serie: "%} {{ person.work_portifolio_serie }} - {% trans "State: "%} {{ person.work_portifolio_state }}</td>                       
+                    </tr>                    
+                    <tr>
+                        <th class="text-right">{% trans "Voter Title" %}</th>
+                        <td>{% trans "Number: "%} {{ person.voter_title_number }} - {% trans "Zone: "%} {{ person.voter_title_zone }} - {% trans "Section: "%} {{ person.voter_title_section }} - {% trans "State: "%} {{ person.voter_title_state }}</td>
+                    </tr>                   
+                    <tr>
+                        <th class="text-right">{% trans "Drivers License" %}</th>
+                        <td>{% trans "Number: "%} {{ person.drivers_license_number }} - {% trans "State:"%}{{ person.drivers_license_state }} - {% trans "Validate:"%}{{ person.drivers_license_validate|date:'d/m/Y' }} - {% trans "Category:"%} {{ person.drivers_license_category }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-right">{% trans "Address" %}</th>
+                        <td>{{ person.address}}, {{ person.address_number}}, {{person.address_neighborhood}} - {{person.address_city}}/{{person.address_state}} - {% trans "Zip Code" %}: <span class="cep">{{person.zip_code}}</span></td>
+                    </tr>
+                    <tr>
+                        <th class="text-right">{% trans "Phones" %}</th>
+                        <td>{{ person.phone_1 }} / {{ person.phone_2 }}</td>
+                    </tr> 
+                    <tr>
+                        <th class="text-right">{% trans "Created by" %}:</th>
+                        <td>{{ person.user_created }} - {{ person.created_at }}</td>
+                    </tr>                    
+                    <tr>
+                        <th class="text-right">{% trans "Updated by" %}</th>
+                        <td>{{ person.user_updated }} - {{ person.updated_at }}</td>
+                    </tr>   
+                                                        
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}
+
+{% block js %}
+<script src="{% static 'core/plugins/jquery/jquery.mask.min.js'%}"></script>
+<script src="{% static 'default/js/jquery_mask.js'%}"></script>
+{% endblock js %}

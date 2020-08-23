@@ -1,28 +1,47 @@
 from django.shortcuts import render,get_object_or_404, get_list_or_404, redirect
 from django.http import JsonResponse, HttpResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.translation import ugettext as _
 from django.contrib import messages
-from .forms import CompanyForm, DepartmentForm, PersonTypeForm
-from .models import Company, Department, PersonType
+from .forms import CompanyForm, DepartmentForm, BaseDepartmentFormSet, PositionForm, BasePositionFormSet, PersonForm
+from Sales.account.forms import  UserCreationForm
+from django.forms import modelformset_factory
+from .models import Company, Department, Position, Person
+from Sales.account.models import User
 from django.db import IntegrityError
 from crispy_forms.utils import render_crispy_form
 from django.template.loader import render_to_string
-#from .compress_image import delete_old_image
-#from django.conf import settings
+from django.db.models import Q
 import os
 import json
+import datetime
+
 ####### COMPANY  ################
 
+def create_department_situations_defaults(obj):    
+    ''' 
+    Cria um Departamento padrão e um Cargo padrão na momemnto da criação da Empresa  
+    '''
+    d = Department.objects.create(name= 'Padrão', abbreviation= 'Padrão', company= obj, user_created=obj.user_created , user_updated=obj.user_updated)
+    d.save()
+    s = Situation.objects.create(name= 'Funcionário', department= d, user_created=obj.user_created , user_updated=obj.user_updated)
+    s.save()
+    return 1
+
 def company_save_form(request,form,template_name, data, user_created=None):
+    marc = 0 # Marcador para saber se está criando ou editando 0 - Editar / 1 - Criar
     if request.method == 'POST':                                              
         if form.is_valid():
             obj = form.save(commit=False)                                   
             if user_created:# Se cair aqui é EDIT                               
                 obj.user_created = user_created                
             else:# Se cair aqui é CREATE
+                marc = 1
                 obj.user_created = request.user
             obj.user_updated = request.user  
             obj.save()
+            if marc:
+                create_department_situations_defaults(obj)
             return redirect('person:url_companies_list')
         else:
             print("algo não está valido.")               
@@ -111,122 +130,176 @@ def company_delete_all(request):
         messages.warning(request, _('You cannot delete. This company has an existing department.'))
     
     return redirect('person:url_companies_list')
-
-def company_translate_js(request):    
-    if request.method == "GET":
-        module_dir = os.path.dirname(__file__)  # get current directory
-        file_path = os.path.join(module_dir, 'templates/default')        
-        translate = ""        
-        with open(file_path+"/translate_data_tables-"+request.LANGUAGE_CODE+".json", 'r') as arquivo:
-            for linha in arquivo:
-                translate += linha        
-        obj = json.loads(translate)        
-    return JsonResponse(obj)
     
 ########### FIM COMPANY ############################
 
 ####### DEPARTMENT  ################
 
-def department_save_form(request,form,template_name, data, user_created=None):
-    if request.method == 'POST':                                              
-        if form.is_valid():
-            obj = form.save(commit=False)                                   
-            if user_created:# Se cair aqui é EDIT                               
-                obj.user_created = user_created                
-            else:# Se cair aqui é CREATE
-                obj.user_created = request.user
-            obj.user_updated = request.user  
-            obj.save()
-            return redirect('person:url_departments_list')
-        else:
-            print("algo não está valido.")               
+def pagination(request,obj,page, lines=10):
+    page = request.GET.get('page', 1)
+    print("Valor de page: ",page)
+    paginator = Paginator(obj, int(lines))        
+    try:
+        objects = paginator.page(page)
+    except PageNotAnInteger:
+        objects = paginator.page(1)
+    except EmptyPage:
+        objects = paginator.page(paginator.num_pages)
     
-    data['form'] = form
-    return render(request,template_name,data)
+    return objects
 
-def department_create(request):
-    template_name = 'department/form.html'    
-    data = {
+def department_save_form(request,form,template_name, context, user_created=None): 
+    def save_obj(request, obj, user_created=None):
+        if user_created:
+            obj.user_created = user_created
+            obj.user_updated = request.user            
+            obj.save()
+        else:
+            for o in obj:                    
+                o.company = context['company']                    
+                o.user_updated = request.user                                    
+                o.user_created = request.user
+                o.save()
+
+    data = dict()   
+    if request.method == 'POST':                                                                
+        if form.is_valid():
+            obj = form.save(commit=False)                                        
+            if user_created:# Se cair aqui é EDIT                             
+                save_obj(request, obj, user_created)
+            else:# Se cair aqui é CREATE                
+                save_obj(request, obj)
+            data['form_is_valid'] = True
+            departments = Department.objects.filter(company__slug=context['company'].slug)
+            objects = pagination(request,departments, 1, lines=10)
+            data['html_list'] = render_to_string('department/_table_company_departments.html', {
+                'departments': objects
+            })
+            data['html_paginate'] = render_to_string('department/_paginate.html', {'departments': objects})
+        else:
+            data['form_is_valid'] = False
+            print("form", form)
+            print("algo não está valido.")                  
+    context['form'] = form    
+    data['html_form'] = render_to_string(template_name, context, request=request)    
+    return JsonResponse(data)
+
+def department_create(request,company_pk):
+    template_name = 'department/_form_create.html'
+    company = Company.objects.get(slug=company_pk)        
+    context = {
             "title": _("Create Department"),
             "back":_("Back"),
             "save":_("Save"),
             "clear":_("Clear"),
+            "company": company,
         }    
-    if request.method == 'POST':                       
-        form = DepartmentForm(request.POST, request.FILES)                
-    else:
-        form = DepartmentForm()             
+    DepartmentFormSet = modelformset_factory(Department, form=DepartmentForm, formset=BaseDepartmentFormSet)  
     
-    return department_save_form(request, form, template_name, data)
+    if request.method == 'POST':                              
+        form = DepartmentFormSet(request.POST, request.FILES, company=company_pk)                     
+    else:         
+        form = DepartmentFormSet(company=company_pk)                   
+    
+    return department_save_form(request, form, template_name, context)
 
 def department_edit(request, slug):    
-    template_name='department/form.html'
-    data = {
+    template_name='department/_form_edit.html'
+    department = get_object_or_404(Department, slug=slug)    
+    company = Company.objects.get(slug=department.company.slug)
+    user_created = department.user_created # Esta linha faz com que o user_created não seja modificado, para mostrar quem criou esta pessoa
+    context = {            
             "title": _("Edit"),
             "back":_("Back"),
             "save":_("Save"),
             "clear":_("Clear"),
-        }    
-    department = get_object_or_404(Department, slug=slug)           
-    user_created = department.user_created # Esta linha faz com que o user_created não seja modificado, para mostrar quem criou esta pessoa    
+            'company': company,
+        }
     if request.method == 'POST':        
         form = DepartmentForm(request.POST, request.FILES, instance=department)                
     else:
         form = DepartmentForm(instance=department)       
-    return department_save_form(request, form, template_name, data, user_created=user_created)
-    
-def departments_list(request):
-    template_name = "department/list.html"
-    departments = Department.objects.all()    
+    return department_save_form(request, form, template_name, context, user_created=user_created)
+
+def company_departments(request, company_pk):
+    template_name = "department/template_shared.html"
+    data=dict()
+    query = request.GET.get('q',None)
+    page = request.GET.get('page',None)
+    lines = request.GET.get('lines',10)
+    if query:                        
+        departments = Department.objects.filter(company__slug=company_pk)
+        departments = departments.filter(            
+            Q(name__icontains=query) | Q(abbreviation__icontains=query)            
+        ).distinct() 
+    else:
+        departments = Department.objects.filter(company__slug=company_pk)
+
+    company = Company.objects.get(slug=company_pk)
+    objects = pagination(request,departments, page, lines=lines)   
     context = {
-        'departments': departments,
+        'company': company,
+        'departments': objects,
         'title': _("Registered Departments"),
-        'add': _("Add")      
-    }
-    return render(request,template_name,context)
+        'add': _("Add"),            
+    }  
+    if query or page:
+        data['form_is_valid'] = True   
+        data['html_list'] = render_to_string('department/_table_company_departments.html', context)       
+        data['html_paginate'] = render_to_string('department/_paginate.html', context)       
+        return JsonResponse(data)
+    else:
+        return render(request,template_name,context)    
 
 def department_detail(request, slug):    
-    template_name = "department/detail.html"
+    template_name = "department/_detail.html"
+    data=dict()
     department = get_object_or_404(Department,slug=slug)
     context = {
         'department': department,
         'title': _("Detail Info"),
         'edit': _("Edit"),
         'list_all': _("List All")
-    }
-    return render(request, template_name, context)
+    }      
+    data['html_form'] = render_to_string(template_name, context, request=request)    
+    return JsonResponse(data)
+    #return render(request, template_name, context)
 
-def department_delete(request, slug):    
-    department = get_object_or_404(Department, slug=slug)    
+def department_delete(request, slug): 
+    template_name = "department/_delete.html"   
+    department = get_object_or_404(Department, slug=slug) 
+    company = department.company.slug
+    data = dict()   
     if request.method == 'POST':        
        try:
-           department.delete()
-           messages.success(request, _('Completed successful.'))
-           return redirect('person:url_departments_list')
-       except IntegrityError:
-           messages.warning(request, _('You cannot delete. This department has an existing department.'))
-           return redirect('person:url_departments_list')    
-
-def department_delete_all(request):
-    marc = 0    
-    if request.method == "POST":        
-        context = request.POST["checkbox_selected"].split(",")
-        context = [str(x) for x in context]      
-        if context:                
-            b = Department.objects.filter(slug__in=context)            
-            for i in b:                
-                try:
-                    i.delete()
-                except IntegrityError:
-                    marc = 1                    
-    if marc == 0:
-        messages.success(request, _('Completed successful.'))
+            department.delete()
+            data['form_is_valid'] = True
+            departments = Department.objects.filter(company__slug=company)
+            objects = pagination(request,departments, 1, lines=10)
+            data['html_list'] = render_to_string('department/_table_company_departments.html', {
+                'departments': objects
+            })
+            data['html_paginate'] = render_to_string('department/_paginate.html', {'departments': objects})           
+       except IntegrityError:           
+            context = {'department': department, 'messages': {'message':_('You cannot delete. This department has an existing department.'), 'level': 0 }}
+            data['html_form'] = render_to_string(template_name,
+            context,
+            request=request,
+            )        
+        #    messages.warning(request, _('You cannot delete. This department has an existing department.'))
+        #    return redirect('person:url_departments_list')    
     else:
-        messages.warning(request, _('You cannot delete. This department has an existing department.'))
+        context = {'department': department}
+        data['html_form'] = render_to_string(template_name,
+            context,
+            request=request,
+        )
+    return JsonResponse(data)
     
-    return redirect('person:url_departments_list')
+########### FIM DEPARTMENT############################
 
-def department_translate_js(request):    
+# VIEW PARA TRADUZIR O DATATABLES. USO GERAL
+def translate_datables_js(request):    
     if request.method == "GET":
         module_dir = os.path.dirname(__file__)  # get current directory
         file_path = os.path.join(module_dir, 'templates/default')        
@@ -236,14 +309,57 @@ def department_translate_js(request):
                 translate += linha        
         obj = json.loads(translate)        
     return JsonResponse(obj)
+
+####### POSITION  ################
+
+def position_save_form(request,form,template_name, context, user_created=None):
+    def save_obj(request, obj, user_created=None):
+        for o in obj:
+            if not o.id:# Se for falso, vai ser um create, senão edit
+                o.user_created = request.user
+            o.department = context['department']                    
+            o.user_updated = request.user                                   
+            o.save()
+    data = dict()
+    if request.method == 'POST':                                              
+        if form.is_valid():
+            obj = form.save(commit=False)
+            for del_obj in form.deleted_objects:#VErifica se tem objetos para deletar
+                del_obj.delete()                                               
+            save_obj(request, obj)
+            data['form_is_valid'] = True
+            
+        else:
+            data['form_is_valid'] = False
+            print("form", form)
+            print("algo não está valido.")                                
     
-########### FIM DEPARTMENT############################
+    context['form'] = form    
+    data['html_form'] = render_to_string(template_name, context, request=request)    
+    return JsonResponse(data)
 
+def position_create(request, department_pk):
+    template_name = 'position/_form.html'    
+    department = Department.objects.get(slug=department_pk)
+    context = {
+            "title": _("Create Positions"),
+            "back":_("Back"),
+            "save":_("Save"),
+            "clear":_("Clear"),
+            'department': department,
+        }
+    PositionFormSet = modelformset_factory(Position, form=PositionForm, formset=BasePositionFormSet, can_delete=True)      
+    if request.method == 'POST':                       
+        form = PositionFormSet(request.POST, department = department.id)                
+    else:
+        form = PositionFormSet(department = department.id)             
+    
+    return position_save_form(request, form, template_name, context)
 
-####### PERSON TYPE  ################
+########## FIM POSITION ############################
 
-
-def person_type_save_form(request,form,template_name, data, user_created=None):
+########### PERSON ############################
+def person_save_form(request,form,template_name, data, user_created=None):
     if request.method == 'POST':                                              
         if form.is_valid():
             obj = form.save(commit=False)                                   
@@ -253,83 +369,86 @@ def person_type_save_form(request,form,template_name, data, user_created=None):
                 obj.user_created = request.user
             obj.user_updated = request.user  
             obj.save()
-            return redirect('person:url_person_types_list')
+            return redirect('person:url_people_list')
         else:
             print("algo não está valido.")               
     
     data['form'] = form
     return render(request,template_name,data)
 
-def person_type_create(request):
-    template_name = 'person_type/form.html'    
-    data = {
-            "title": _("Create PersonType"),
-            "back":_("Back"),
-            "save":_("Save"),
-            "clear":_("Clear"),
-        }    
-    if request.method == 'POST':                       
-        form = PersonTypeForm(request.POST, request.FILES)                
-    else:
-        form = PersonTypeForm()             
-    
-    return person_type_save_form(request, form, template_name, data)
-
-def person_type_edit(request, slug):    
-    template_name='person_type/form.html'
+def person_edit(request, slug):    
+    template_name='person/form.html'
     data = {
             "title": _("Edit"),
             "back":_("Back"),
             "save":_("Save"),
             "clear":_("Clear"),
         }    
-    person_type = get_object_or_404(PersonType, slug=slug)           
-    user_created = person_type.user_created # Esta linha faz com que o user_created não seja modificado, para mostrar quem criou esta pessoa    
+    person = get_object_or_404(Person, slug=slug)          
+    user_created = person.user_created # Esta linha faz com que o user_created não seja modificado, para mostrar quem criou esta pessoa    
     if request.method == 'POST':        
-        form = PersonTypeForm(request.POST, request.FILES, instance=person_type)                
+        form = PersonForm(request.POST, request.FILES, instance=person)                
     else:
-        form = PersonTypeForm(instance=person_type)       
-    return person_type_save_form(request, form, template_name, data, user_created=user_created)
+        form = PersonForm(instance=person)       
+    return person_save_form(request, form, template_name, data, user_created=user_created)
     
-def person_types_list(request):
-    template_name = "person_type/list.html"
-    person_types = PersonType.objects.all()    
+def people_list(request):
+    template_name = "person/list.html"
+    people = Person.objects.all()    
     context = {
-        'person_types': person_types,
-        'title': _("Registered Companies"),
+        'people': people,
+        'title': _("Registered People"),
         'add': _("Add")      
     }
     return render(request,template_name,context)
 
-def person_type_detail(request, slug):    
-    template_name = "person_type/detail.html"
-    person_type = get_object_or_404(PersonType,slug=slug)
+def person_detail(request, slug):    
+    template_name = "person/detail.html"
+    person = get_object_or_404(Person,slug=slug)
     context = {
-        'person_type': person_type,
+        'person': person,
         'title': _("Detail Info"),
         'edit': _("Edit"),
         'list_all': _("List All")
     }
     return render(request, template_name, context)
 
-def person_type_delete(request, slug):    
-    person_type = get_object_or_404(PersonType, slug=slug)    
+def person_deactive(request, slug):    
+    person = get_object_or_404(Person, slug=slug) 
+    #user = User.objects.filter(pk=person.user.id)       
+    context = dict()
+    b = {'true': True, 'false': False}
+    if request.method == 'POST':        
+        sw = request.POST['sw'] 
+        print("valor sw", b[sw])       
+        context['is_valid'] = True
+        person.user.is_active = b[sw]
+        person.user.save()
+        context['is_active'] = b[sw]
+    else:
+        context['is_valid'] = False
+        context['is_active'] = 'teste'                 
+    
+    return JsonResponse(context)
+
+def person_delete(request, slug):    
+    person = get_object_or_404(Person, slug=slug)    
     if request.method == 'POST':        
        try:
-           person_type.delete()
+           person.delete()
            messages.success(request, _('Completed successful.'))
-           return redirect('person:url_person_types_list')
+           return redirect('person:url_people_list')
        except IntegrityError:
-           messages.warning(request, _('You cannot delete. This person_type has an existing department.'))
-           return redirect('person:url_person_types_list')    
+           messages.warning(request, _('You cannot delete. This person has an existing department.'))
+           return redirect('person:url_people_list')    
 
-def person_type_delete_all(request):
+def person_delete_all(request):
     marc = 0    
     if request.method == "POST":        
         context = request.POST["checkbox_selected"].split(",")
         context = [str(x) for x in context]      
         if context:                
-            b = PersonType.objects.filter(slug__in=context)            
+            b = Person.objects.filter(slug__in=context)            
             for i in b:                
                 try:
                     i.delete()
@@ -338,20 +457,29 @@ def person_type_delete_all(request):
     if marc == 0:
         messages.success(request, _('Completed successful.'))
     else:
-        messages.warning(request, _('You cannot delete. This person_type has an existing department.'))
+        messages.warning(request, _('You cannot delete. This person has an existing department.'))
     
-    return redirect('person:url_person_types_list')
+    return redirect('person:url_people_list')
 
-def person_type_translate_js(request):    
-    if request.method == "GET":
-        module_dir = os.path.dirname(__file__)  # get current directory
-        file_path = os.path.join(module_dir, 'templates/default')        
-        translate = ""        
-        with open(file_path+"/translate_data_tables-"+request.LANGUAGE_CODE+".json", 'r') as arquivo:
-            for linha in arquivo:
-                translate += linha        
-        obj = json.loads(translate)        
-    return JsonResponse(obj)
-    
 
-########### FIM PERSON TYPE ############################
+def create_user_and_person(request):
+    template_name = 'core/signup_form.html'
+    context = {
+        "title": _("Create User"),
+        "back":_("Back"),
+        "save":_("Save"),
+        "clear":_("Clear"),
+    } 
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            obj = form.save()
+            person = Person(name='{} {}'.format(obj.first_name,obj.last_name), user = obj, user_created = request.user, user_updated = request.user)
+            person.save()
+            return redirect('person:url_person_edit', person.slug)            
+    else:
+        form = UserCreationForm()
+    context['form'] = form
+    return render(request, template_name, context)
+
+########### FIM PERSON ############################

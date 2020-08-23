@@ -1,0 +1,32 @@
+{% load static %}
+{% load i18n %}
+
+  <div class="card-header">
+      <h3 class="card-title">{% trans "Situations" %}</h3>
+  </div>
+  <table id="table_situations" class="table table-bordered" data-lang="{% url 'person:url_situation_translate_js' %}">
+<thead>
+    <tr class="text-sm-center">      
+      <th>{% trans "Name" %}</th>                           
+      <th>{% trans "Options" %}</th>                                         
+    </tr>
+  </thead>                  
+  <tbody>
+    {% for position in positions %}
+    <tr class="text-sm-center">      
+      <td>{{ position.name }}</td>                                         
+      <td class="text-center">                      
+        <a href="{% url 'person:url_position_edit' position.slug %}"><span class='badge badge-warning'>{% trans "edit" %}</span></a>
+        <a href="{% url 'person:url_position_detail' position.slug %}"><span class='badge badge-info'>{% trans "details" %}</span></a>                                                                          
+        <a href="" data-url="{% url 'person:url_position_delete' position.slug %}" id="button_modal_{{ position.slug }}" class='badge badge-danger' data-js="link_delete">{% trans "delete" %}</a>
+        </form>
+      </td>                      
+    </tr>
+    {% empty %}
+        <tr>
+          <td colspan="2" class="text-center bg-warning">No Positions</td>
+        </tr>                 
+    {% endfor %}   
+  </tbody>                  
+              
+</table>
