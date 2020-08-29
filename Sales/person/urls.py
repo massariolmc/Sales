@@ -34,7 +34,7 @@ urlpatterns = [
     path('person/<slug:slug>/edit', views.person_edit, name='url_person_edit'),
     path('person/<slug:slug>/deactive', views.person_deactive, name='url_person_deactive'),
     path('person/<slug:slug>/delete', views.person_delete, name='url_person_delete'),
-    path('person/delete_all/', views.person_delete_all, name='url_person_delete_all'),   
+     
 
     # URL PARA TRADUZIR O DATATABLES. USO GERAL
     path('person/translate-js/', views.translate_datables_js, name='url_translate_datables_js'),

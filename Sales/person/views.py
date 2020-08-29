@@ -135,19 +135,6 @@ def company_delete_all(request):
 
 ####### DEPARTMENT  ################
 
-def pagination(request,obj,page, lines=10):
-    page = request.GET.get('page', 1)
-    print("Valor de page: ",page)
-    paginator = Paginator(obj, int(lines))        
-    try:
-        objects = paginator.page(page)
-    except PageNotAnInteger:
-        objects = paginator.page(1)
-    except EmptyPage:
-        objects = paginator.page(paginator.num_pages)
-    
-    return objects
-
 def department_save_form(request,form,template_name, context, user_created=None): 
     def save_obj(request, obj, user_created=None):
         if user_created:
@@ -376,6 +363,26 @@ def person_save_form(request,form,template_name, data, user_created=None):
     data['form'] = form
     return render(request,template_name,data)
 
+def create_user_and_person(request):
+    template_name = 'core/signup_form.html'
+    context = {
+        "title": _("Create User"),
+        "back":_("Back"),
+        "save":_("Save"),
+        "clear":_("Clear"),
+    } 
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            obj = form.save()
+            person = Person(name='{} {}'.format(obj.first_name,obj.last_name), user = obj, user_created = request.user, user_updated = request.user)
+            person.save()
+            return redirect('person:url_person_edit', person.slug)            
+    else:
+        form = UserCreationForm()
+    context['form'] = form
+    return render(request, template_name, context)
+
 def person_edit(request, slug):    
     template_name='person/form.html'
     data = {
@@ -394,13 +401,29 @@ def person_edit(request, slug):
     
 def people_list(request):
     template_name = "person/list.html"
-    people = Person.objects.all()    
+    data=dict()
+    query = request.GET.get('q',None)
+    page = request.GET.get('page',None)
+    lines = request.GET.get('lines',10)
+    people = Person.objects.all()
+    if query:                       
+        people = people.filter(            
+            Q(user__first_name__icontains=query) | Q(user__last_name__icontains=query) | Q(user__cpf__icontains=query) | Q(user__email__icontains=query)           
+        ).distinct()    
+    objects = pagination(request,people, page, lines=lines)
+        
     context = {
-        'people': people,
+        'people': objects,
         'title': _("Registered People"),
         'add': _("Add")      
     }
-    return render(request,template_name,context)
+    if query or page:
+        data['form_is_valid'] = True   
+        data['html_list'] = render_to_string('person/_table.html', context)       
+        data['html_paginate'] = render_to_string('person/_paginate.html', context)       
+        return JsonResponse(data)
+    else:
+        return render(request,template_name,context) 
 
 def person_detail(request, slug):    
     template_name = "person/detail.html"
@@ -431,55 +454,50 @@ def person_deactive(request, slug):
     
     return JsonResponse(context)
 
-def person_delete(request, slug):    
-    person = get_object_or_404(Person, slug=slug)    
+def person_delete(request, slug):  
+    template_name = "person/_delete.html" 
+    person = get_object_or_404(Person, slug=slug)
+    user = User.objects.get(pk=person.user.id)
+    data = dict()   
     if request.method == 'POST':        
        try:
-           person.delete()
-           messages.success(request, _('Completed successful.'))
-           return redirect('person:url_people_list')
-       except IntegrityError:
-           messages.warning(request, _('You cannot delete. This person has an existing department.'))
-           return redirect('person:url_people_list')    
-
-def person_delete_all(request):
-    marc = 0    
-    if request.method == "POST":        
-        context = request.POST["checkbox_selected"].split(",")
-        context = [str(x) for x in context]      
-        if context:                
-            b = Person.objects.filter(slug__in=context)            
-            for i in b:                
-                try:
-                    i.delete()
-                except IntegrityError:
-                    marc = 1                    
-    if marc == 0:
-        messages.success(request, _('Completed successful.'))
+            person.delete()
+            user.delete()
+            data['form_is_valid'] = True
+            people = Person.objects.all()
+            objects = pagination(request,people, 1, lines=10)
+            data['html_list'] = render_to_string('person/_table.html', {
+                'people': objects
+            })
+            data['html_paginate'] = render_to_string('person/_paginate.html', {'people': objects})           
+       except IntegrityError:           
+            context = {'person': department, 'messages': {'message':_('You cannot delete. This person has many relationships.'), 'level': 0 }}
+            data['html_form'] = render_to_string(template_name,
+            context,
+            request=request,
+            )                 
     else:
-        messages.warning(request, _('You cannot delete. This person has an existing department.'))
-    
-    return redirect('person:url_people_list')
-
-
-def create_user_and_person(request):
-    template_name = 'core/signup_form.html'
-    context = {
-        "title": _("Create User"),
-        "back":_("Back"),
-        "save":_("Save"),
-        "clear":_("Clear"),
-    } 
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            obj = form.save()
-            person = Person(name='{} {}'.format(obj.first_name,obj.last_name), user = obj, user_created = request.user, user_updated = request.user)
-            person.save()
-            return redirect('person:url_person_edit', person.slug)            
-    else:
-        form = UserCreationForm()
-    context['form'] = form
-    return render(request, template_name, context)
+        context = {'person': person}
+        data['html_form'] = render_to_string(template_name,
+            context,
+            request=request,
+        )
+    return JsonResponse(data)    
 
 ########### FIM PERSON ############################
+
+########## PAGINAÇÃO USO GERAL ##########################
+def pagination(request,obj,page, lines=10):
+    page = request.GET.get('page', 1)
+    print("Valor de page: ",page)
+    paginator = Paginator(obj, int(lines))        
+    try:
+        objects = paginator.page(page)
+    except PageNotAnInteger:
+        objects = paginator.page(1)
+    except EmptyPage:
+        objects = paginator.page(paginator.num_pages)
+    
+    return objects
+
+########## FIM PAGINAÇÃO USO GERAL ##########################
