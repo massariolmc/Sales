@@ -3,11 +3,7 @@
 {% load i18n %}
 
 {% block css %}
-  <!-- iCheck for checkboxes and radio inputs -->
-  <link rel="stylesheet" href="{% static 'core/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
-  <!-- DATA TABLES -->
-  <link rel="stylesheet" href="{% static 'core/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
-  <link rel="stylesheet" href="{% static 'core/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+  
 
       <!-- Toastr -->
   <link rel="stylesheet" href="{% static 'core/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css' %}">
@@ -41,27 +37,62 @@
           </div>
 
             <div class="card-body">
+              <div id="row_search_lines" class="row mb-2">
+                  <div class="col-sm-6">
+                    <div class="input-group input-group-sm" style="width: 150px;">
+                        <select data-js="js-get-lines" class="form-control js-select" id="sel">            
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>                        
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="input-group input-group-sm float-right" style="width: 150px;">
+                        <input type="text" name="table_search" class="form-control js-search" placeholder={% trans 'Search'%} data-js="js-get-text" data-url="" >
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                  </div>    
+                </div> 
               <div class="table-responsive">
-                {% include 'person/_table.html' %}
-              </div>
-              <button data-url="{% url 'person:url_person_delete_all' %}" data-js="click_checkbox" class="btn btn-danger" ><i class="fas fa-minus-circle fa-1x"></i>{% trans "Remove" %}</button>
+                <table id="person_table" class="table table-bordered" data-lang="{% url 'person:url_translate_datables_js' %}">
+                  <thead>
+                    <tr class="text-sm-center">      
+                      <th>{% trans "CPF" %}</th>
+                      <th>{% trans "Name" %}</th>
+                      <th>{% trans "Email" %}</th>                      
+                      <th>{% trans "Active" %}</th>   
+                      <th>{% trans "Options" %}</th>                                         
+                    </tr>
+                  </thead>                  
+                  <tbody>
+                    {% include 'person/_table.html' %}
+                  </tbody>                  
+                </table> 
+              </div>              
             </div>
+            <div class="card-footer clearfix ">
+              <div id="click_page">
+                {% include 'person/_paginate.html' %}
+              </div>    
+            </div>
+          
              
-{% include 'default/_modal_delete.html' %}
-
-{% include 'default/_modal_checkbox.html' %}
+<div class="modal fade" id="modal-person">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    </div>
+  </div>
+</div>
 
 {% endblock content %}
 
 {% block js %}
-<script src="{% static 'core/plugins/datatables/jquery.dataTables.min.js'%}"></script>
-<script src="{% static 'core/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js'%}"></script>
-<script src="{% static 'core/plugins/datatables-responsive/js/dataTables.responsive.min.js'%}"></script>
-<script src="{% static 'core/plugins/datatables-responsive/js/responsive.bootstrap4.min.js'%}"></script>
 
-
-<script src="{% static 'default/js/checkbox_delete_all.js'%}"></script>
-<script src="{% static 'default/js/dataTables_default.js'%}"></script>
 <!-- Bootstrap Switch -->
 <script src="{% static 'core/plugins/bootstrap-switch/js/bootstrap-switch.min.js'%}"></script>
 <!-- TOAST -->
@@ -99,7 +130,123 @@
     });    
   };
 
+   var loadForm = function (e) {
+    e.preventDefault()
+    var btn = $(this);
+    $.ajax({
+      url: btn.attr("data-url"),
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function () {                
+        $("#modal-person").modal("show");
+      },
+      success: function (data) {        
+        $("#modal-person .modal-content").html(data.html_form);
+      }
+    });
+  };
+
+  var saveForm = function () {
+    var form = $(this);
+    $.ajax({
+      url: form.attr("action"),
+      data: form.serialize(),
+      type: form.attr("method"),
+      dataType: 'json',
+      success: function (data) {        
+        if (data.form_is_valid) {
+          $("#person-table tbody").html(data.html_list);
+          $("#modal-person").modal("hide");          
+          openToastSuccess();
+          handleShow();         
+        }
+        else {
+          $("#modal-person .modal-content").html(data.html_form);
+        }
+      }
+    });
+    return false;
+  };
+
+  var requestSearch = function(text,url,page,lines){
+    $.ajax({
+        type: "GET",                
+        url: url,
+        data: {'q': text, 'page': page, 'lines':lines },
+        dataType: "json",
+        beforeSend : function(){
+            
+        },
+        success: function(data){                                
+            if (data.form_is_valid) {
+              $("#person_table tbody").html(data.html_list);              
+              $("#click_page").html(data.html_paginate);              
+            }
+            else {
+              console.log("Retorno não valido");
+            }                                
+        },
+        failure: function(data){
+            
+        },
+    });                         
+  }
+
+  var handleSearch = function(){
+    var search = $(this);
+    console.log("valores", search.val())    
+    var page = $(location).attr('href');    
+    var marc = page.indexOf("=")
+    if (marc != -1) {
+      page = page.split("=")[1]      
+    }
+    else{
+      page = 1
+    }   
+    console.log("valor page",page)
+    var url = search.attr("data-url")
+    var text = search.val()
+    var lines = $('[data-js="js-get-lines"]').val();
+    requestSearch(text, url, page, lines)
+  }
+
+  
+  var handlePage = function(e){
+      e.preventDefault();
+      var page = $(this);    
+      console.log("Valor",page.attr('href').indexOf('='));
+
+      if ( page.attr('href').indexOf('=') != -1){
+        page = page.attr('href').split('=')[1]
+      }
+      else{
+        page = 1
+      }    
+      console.log("page",page);
+      var text = $('[data-js="js-get-text"]').val();
+      var url = $('[data-js="js-get-text"]').attr('data-url');
+      var lines = $('[data-js="js-get-lines"]').val();
+      requestSearch(text, url, page, lines)
+  }
+
+  var handleShow = function(){  
+    var select = $('[data-js="js-get-lines"]').val();  
+    var text = $('[data-js="js-get-text"]').val();
+    var url = $('[data-js="js-get-text"]').attr('data-url');
+    var page = 1;
+    var lines = select
+    requestSearch(text, url, page, lines)
+  }
+  
+
   $("#person_table").on("change", '.js-checkbox-switch', ck);
+  
+  $("#person_table").on("click", '.js-link-delete', loadForm);
+  $("#modal-person").on("submit", ".js-delete-form", saveForm);
+
+  $("#row_search_lines").on("input", ".js-search", handleSearch);
+  $("#click_page").on("click", ".page-link", handlePage);
+  $("#row_search_lines").on("change", ".js-select", handleShow);
 
 })(window,document) 
 
