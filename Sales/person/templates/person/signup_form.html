@@ -1,0 +1,52 @@
+{% extends 'core/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title%}
+   {{ title }}
+{% endblock title%}
+
+{% block content %}
+<div class="row justify-content-center">
+  <!-- left column -->
+  <div class="col-md-6">
+    <!-- general form elements -->
+    <div class="card card-primary">
+      <div class="card-header">
+        <h3 class="card-title">{{ title }}</h3>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+      
+        <div class="card-body">
+         
+          {% crispy form %}
+        </div>
+        
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+(function(doc,win){
+  'use strict';  
+  var $cpf = doc.querySelector('input[name=cpf]');
+  function somenteNumeros(e) {        
+      var charCode = e.charCode ? e.charCode : e.keyCode;            
+      // charCode 8 = backspace   
+      // charCode 9 = tab
+      if (charCode != 8 && charCode != 9) {
+          // charCode 48 equivale a 0   
+          // charCode 57 equivale a 9
+          if (charCode < 48 || charCode > 57) {                  
+              e.preventDefault();                        
+          }
+      }
+  }  
+  $cpf.addEventListener('keypress',somenteNumeros,false);
+})(document,window)
+
+</script>
+{% endblock js %}

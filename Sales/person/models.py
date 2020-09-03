@@ -83,31 +83,6 @@ class Department(models.Model):
     def __str__(self):
         return self.name
 
-class Position(models.Model):
-    name = models.CharField(_("Name"), max_length=100, blank=False, null= False)        
-    description = models.TextField(_('Description'), blank=True)      
-    slug = models.SlugField(_('Slug'), blank=True)     
-    department = models.ForeignKey(Department, verbose_name=_("Department"), on_delete=models.PROTECT, blank=False, null= False)         
-    user_created = models.ForeignKey(User, related_name="person_type_user_created_id", verbose_name=_("Created by"), blank=True, on_delete=models.PROTECT)
-    user_updated = models.ForeignKey(User, related_name="person_type_user_updated_id", verbose_name=_("Updated by"), blank=True, on_delete=models.PROTECT)
-    created_at = models.DateTimeField(_('Created at'),auto_now_add=True)
-    updated_at = models.DateTimeField(_('Updated at'), auto_now=True)
-    class Meta:
-        verbose_name = _("Situation")
-        verbose_name_plural = _("Situations")
-        ordering = ["name"]
-    
-    def save(self, *args, **kwargs):        
-                    
-        if not self.id:
-            #Insere um valor para o Slug            
-            self.slug = unique_uuid(self.__class__)               
-        # save
-        super().save(*args, **kwargs)
-    
-    def __str__(self):
-        return self.name
-
 class Person(models.Model):
     gender_choices = [("Masculino","Masculino"), ("Feminino","Feminino")]
     blood_choices = [("A+","A+"), ("A-","A-"), ("B+","B+"), ("B-","B-"), ("AB+","AB+"), ("AB-","AB-"), ("O+","O+"), ("O-","O-")]
@@ -185,3 +160,54 @@ class Person(models.Model):
 
     def __str__(self):
         return self.name
+
+class Position(models.Model):
+    name = models.CharField(_("Name"), max_length=100, blank=False, null= False)        
+    description = models.TextField(_('Description'), blank=True)      
+    slug = models.SlugField(_('Slug'), blank=True)     
+    department = models.ForeignKey(Department, verbose_name=_("Department"), on_delete=models.PROTECT, blank=False, null= False)         
+    members = models.ManyToManyField(Person, through='PersonPosition')
+    user_created = models.ForeignKey(User, related_name="person_type_user_created_id", verbose_name=_("Created by"), blank=True, on_delete=models.PROTECT)
+    user_updated = models.ForeignKey(User, related_name="person_type_user_updated_id", verbose_name=_("Updated by"), blank=True, on_delete=models.PROTECT)
+    created_at = models.DateTimeField(_('Created at'),auto_now_add=True)
+    updated_at = models.DateTimeField(_('Updated at'), auto_now=True)
+    class Meta:
+        verbose_name = _("Situation")
+        verbose_name_plural = _("Situations")
+        ordering = ["name"]
+    
+    def save(self, *args, **kwargs):        
+                    
+        if not self.id:
+            #Insere um valor para o Slug            
+            self.slug = unique_uuid(self.__class__)               
+        # save
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.name
+
+class PersonPosition(models.Model):
+    active = models.BooleanField(_("Active"), default=True, blank=False, null= False)        
+    person = models.ForeignKey(Person, verbose_name=_("person"), on_delete=models.PROTECT, blank=False, null= False)         
+    position = models.ForeignKey(Position, verbose_name=_("position"), on_delete=models.PROTECT, blank=False, null= False)         
+    slug = models.SlugField(_('Slug'), blank=True)         
+    user_created = models.ForeignKey(User, related_name="person_position_user_created_id", verbose_name=_("Created by"), blank=True, on_delete=models.PROTECT)
+    user_updated = models.ForeignKey(User, related_name="person_position_user_updated_id", verbose_name=_("Updated by"), blank=True, on_delete=models.PROTECT)
+    created_at = models.DateTimeField(_('Created at'),auto_now_add=True)
+    updated_at = models.DateTimeField(_('Updated at'), auto_now=True)
+    class Meta:
+        verbose_name = _("PersonPosition")
+        verbose_name_plural = _("PersonPositions")
+        ordering = ["person"]
+    
+    def save(self, *args, **kwargs):        
+                    
+        if not self.id:
+            #Insere um valor para o Slug            
+            self.slug = unique_uuid(self.__class__)               
+        # save
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.person.name
