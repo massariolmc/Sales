@@ -1,5 +1,6 @@
 from django.forms import ModelForm, TextInput, Textarea, NumberInput, DateInput, Select, SelectDateWidget, HiddenInput, DateTimeInput, EmailInput, FileInput, CheckboxInput
-from django.forms import BaseModelFormSet
+from django.forms import BaseModelFormSet, ModelChoiceField
+from django.contrib.auth.forms import UserCreationForm
 from .models import Company, Department, Position, Person
 from Sales.account.models import User
 from crispy_forms.helper import FormHelper
@@ -151,12 +152,7 @@ class BaseDepartmentFormSet(BaseModelFormSet):
                 n = Department.objects.filter(name__iexact=name, company__slug=self.company).exists()#Verifica se o nome já existe        
                 
             if n:            
-                form.add_error('name', msg)  
-
-
-            #form.cleaned_data['name'] = name
-            # update the instance value.
-            #form.instance.name = name
+                form.add_error('name', msg)     
 
 class PositionForm(ModelForm):
     
@@ -173,7 +169,7 @@ class BasePositionFormSet(BaseModelFormSet):
         self.department =  kwargs.get('department',None)        
         del(kwargs['department'])
         super().__init__(*args, **kwargs)        
-        self.queryset = Position.objects.filter(department__id=self.department)            
+        self.queryset = Position.objects.filter(department__id=self.department).exclude(name='Funcionário')            
         
 class PersonForm(ModelForm):
 
@@ -315,4 +311,57 @@ class PersonForm(ModelForm):
                     </div>
                 </div>'''
             ),         
+        )
+
+class UserCreationForm(UserCreationForm):
+    select_company = ModelChoiceField(label=_("Choose Company"),required=True, queryset=Company.objects.all(), empty_label=_("Nothing"))
+    class Meta:
+        model = User
+        fields = ("cpf", "first_name", "last_name", "username", "email", "password1", "password2")
+    
+    def clean_cpf(self): # No caso aqui clean_nome_do_campo        
+        cpf = self.cleaned_data['cpf']
+        if not cpf.isdigit():                              
+            raise ValidationError("Aceita apenas números.")
+        return cpf # sempre retornar um dado, de preferencia o valor que estava no campo.
+    def __init__(self, *args, **kwargs):                                    
+        super().__init__(*args, **kwargs)        
+        self.helper = FormHelper()        
+        self.helper.layout = Layout(                                                                   
+            Row(
+                Column('cpf', css_class='form-group col-md-4 mb-0'),
+                Column('first_name', css_class='form-group col-md-4 mb-0'),                
+                Column('last_name', css_class='form-group col-md-4 mb-0'),                
+                css_class='form-row'
+            ),
+            Row(
+                Column('username', css_class='form-group col-md-6 mb-0'),
+                Column('email', css_class='form-group col-md-6 mb-0'),                                
+                css_class='form-row'
+            ),
+            Row(
+                Column('password1', css_class='form-group col-md-6 mb-0'),
+                Column('password2', css_class='form-group col-md-6 mb-0'),                                
+                css_class='form-row'
+            ),
+            Row(
+                Column('select_company', css_class='form-group col-md-6 mb-0'),               
+                css_class='form-row'
+            ),
+            HTML('''
+                <hr class="divider" />
+                 <div class="row">    
+                    <div class="col-sm-6">
+                        <span class="float-left">
+                            <button type="submit" class="btn btn-primary">{{ save }}</button>  	  
+                            <button type="reset" class="btn btn-secondary">{{ clear }}</button>
+                        </span>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="float-right">
+                            <a href="{% url 'person:url_people_list'%}" class="btn btn-warning">{{ back }}</a>
+                        </span>  
+                    </div>
+                </div>'''
+            ),
         )

@@ -1,0 +1,30 @@
+{% load static %}
+{% for department,positions,people, total in person_positions %}
+<tr>
+    <td>
+        {{ forloop.counter }}
+    </td>
+    <td>
+        {{ department }}
+    </td>
+    <td>   
+        <ul class="list-inline">
+            {% for name,image in people %}               
+                <li class="list-inline-item">
+                    <img alt="{{ name }}" class="table-avatar" src="/media/{{ image }}">
+                </li>
+            {% endfor %}        
+        </ul>
+    </td>                     
+    <td class="project-state">
+        <span class="badge badge-success">{{ total }}</span>
+    </td>
+    <td class="project-actions">
+        <a class="btn btn-primary btn-sm" href="#">
+            <i class="fas fa-folder">
+            </i>
+            View
+        </a>        
+    </td>
+</tr>                  
+{% endfor %}

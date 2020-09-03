@@ -3,15 +3,16 @@ from django.http import JsonResponse, HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.translation import ugettext as _
 from django.contrib import messages
-from .forms import CompanyForm, DepartmentForm, BaseDepartmentFormSet, PositionForm, BasePositionFormSet, PersonForm
-from Sales.account.forms import  UserCreationForm
+from .forms import CompanyForm, DepartmentForm, BaseDepartmentFormSet, PositionForm, BasePositionFormSet, PersonForm, UserCreationForm
+#from Sales.account.forms import  UserCreationForm
 from django.forms import modelformset_factory
-from .models import Company, Department, Position, Person
+from .models import Company, Department, Position, Person, PersonPosition
 from Sales.account.models import User
 from django.db import IntegrityError
 from crispy_forms.utils import render_crispy_form
 from django.template.loader import render_to_string
-from django.db.models import Q
+from django.db.models import Q, Sum, Count, Prefetch
+from django.db import connection
 import os
 import json
 import datetime
@@ -24,7 +25,7 @@ def create_department_situations_defaults(obj):
     '''
     d = Department.objects.create(name= 'Padrão', abbreviation= 'Padrão', company= obj, user_created=obj.user_created , user_updated=obj.user_updated)
     d.save()
-    s = Situation.objects.create(name= 'Funcionário', department= d, user_created=obj.user_created , user_updated=obj.user_updated)
+    s = Position.objects.create(name= 'Funcionário', department= d, user_created=obj.user_created , user_updated=obj.user_updated)
     s.save()
     return 1
 
@@ -215,12 +216,12 @@ def company_departments(request, company_pk):
     page = request.GET.get('page',None)
     lines = request.GET.get('lines',10)
     if query:                        
-        departments = Department.objects.filter(company__slug=company_pk)
+        departments = Department.objects.filter(company__slug=company_pk).exclude(name='Padrão')
         departments = departments.filter(            
             Q(name__icontains=query) | Q(abbreviation__icontains=query)            
         ).distinct() 
     else:
-        departments = Department.objects.filter(company__slug=company_pk)
+        departments = Department.objects.filter(company__slug=company_pk).exclude(name='Padrão')
 
     company = Company.objects.get(slug=company_pk)
     objects = pagination(request,departments, page, lines=lines)   
@@ -364,7 +365,7 @@ def person_save_form(request,form,template_name, data, user_created=None):
     return render(request,template_name,data)
 
 def create_user_and_person(request):
-    template_name = 'core/signup_form.html'
+    template_name = 'person/signup_form.html'
     context = {
         "title": _("Create User"),
         "back":_("Back"),
@@ -374,9 +375,12 @@ def create_user_and_person(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
+            position = Position.objects.get(name='Funcionário',department__name='Padrão', department__company_id=form.cleaned_data['select_company'])            
             obj = form.save()
             person = Person(name='{} {}'.format(obj.first_name,obj.last_name), user = obj, user_created = request.user, user_updated = request.user)
             person.save()
+            person_position = PersonPosition(person=person,position=position, user_created = request.user, user_updated = request.user)
+            person_position.save()
             return redirect('person:url_person_edit', person.slug)            
     else:
         form = UserCreationForm()
@@ -485,6 +489,29 @@ def person_delete(request, slug):
     return JsonResponse(data)    
 
 ########### FIM PERSON ############################
+
+########### PERSON POSITION ############################
+
+def create_person_position(request):
+    template_name = 'person_position/list.html'                      
+    departments = Department.objects.prefetch_related(Prefetch('position_set',queryset=Position.objects.prefetch_related('members'))).filter(company__id=7)            
+    person_positions = list()
+    total = 0
+    for p in departments:        
+        #print("Department:{} - Position: {}  Pessoas: {}".format(p.name, [pos.name for pos in p.position_set.all()], [person.name for people in p.position_set.prefetch_related('members') for person in people.members.all()]))
+        person_positions.append( [
+            p.name, [pos.name for pos in p.position_set.all()], [(person.name,person.image) for people in p.position_set.prefetch_related('members') for person in people.members.all()], sum([people.members.count() for people in p.position_set.prefetch_related('members')])
+        ])
+    print("PersonPosition valores:",person_positions)
+    context = dict()
+    context = {
+        'title': _('List of Employees'),
+        'person_positions': person_positions        
+    }   
+    return render(request,template_name,context)
+
+
+########### FIM PERSON POSITION ########################
 
 ########## PAGINAÇÃO USO GERAL ##########################
 def pagination(request,obj,page, lines=10):
